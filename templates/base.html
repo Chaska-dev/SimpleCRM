@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CRM{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <script src="{% static 'js/alpine.min.js' %}" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-neutral-900 text-gray-100">
+    {% block body %}{% endblock %}
+</body>
+</html>
