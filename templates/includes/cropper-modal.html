@@ -1,0 +1,29 @@
+<!-- Cropper Modal -->
+<div id="cropperModal" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center hidden">
+    <div class="bg-neutral-800 rounded-xl p-6 max-w-2xl w-full mx-4" style="max-height: 90vh;">
+        <h3 class="text-lg font-semibold text-white mb-2">Crop Your Photo</h3>
+        <p class="text-gray-400 text-sm mb-4">Drag the circle to move it. Drag corners to resize.</p>
+        
+        <div class="bg-neutral-900 rounded-lg overflow-hidden mb-4 relative flex items-center justify-center" id="cropperContainer" style="height: 400px;">
+            <img id="cropperImage" class="max-w-full max-h-full object-contain" style="display: block;">
+            <div id="cropFrame" class="absolute z-20" style="min-width: 80px; min-height: 80px;">
+                <div id="cropCircle" class="w-full h-full border-2 border-white rounded-full cursor-move" style="box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);"></div>
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-white/30 -translate-y-1/2 pointer-events-none"></div>
+                <div class="absolute left-1/2 top-0 w-0.5 h-full bg-white/30 -translate-x-1/2 pointer-events-none"></div>
+                <div class="resize-handle absolute w-4 h-4 bg-white rounded-full cursor-nw-resize" data-dir="nw" style="top: -8px; left: -8px;"></div>
+                <div class="resize-handle absolute w-4 h-4 bg-white rounded-full cursor-ne-resize" data-dir="ne" style="top: -8px; right: -8px;"></div>
+                <div class="resize-handle absolute w-4 h-4 bg-white rounded-full cursor-sw-resize" data-dir="sw" style="bottom: -8px; left: -8px;"></div>
+                <div class="resize-handle absolute w-4 h-4 bg-white rounded-full cursor-se-resize" data-dir="se" style="bottom: -8px; right: -8px;"></div>
+            </div>
+        </div>
+        
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="closeCropper()" class="px-6 py-2 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors">
+                Cancel
+            </button>
+            <button type="button" id="cropSaveBtn" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
+                Save Photo
+            </button>
+        </div>
+    </div>
+</div>

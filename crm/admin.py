@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
-    Workspace, User, Tag, Company, Contact, SocialProfile,
+    Workspace, User, Tag, Company, Contact,
     ContactCompanyRelationship, Note, Activity, AuditLog,
     CustomField, CustomFieldValue, CompanyAccess
 )
@@ -43,13 +43,6 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'workspace', 'job_title', 'created_at']
     list_filter = ['workspace', 'gender']
     search_fields = ['first_name', 'last_name', 'email', 'phone']
-
-
-@admin.register(SocialProfile)
-class SocialProfileAdmin(admin.ModelAdmin):
-    list_display = ['contact', 'network', 'url']
-    list_filter = ['network']
-    search_fields = ['contact__first_name', 'contact__last_name', 'username']
 
 
 @admin.register(ContactCompanyRelationship)

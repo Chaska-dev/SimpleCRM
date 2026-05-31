@@ -170,6 +170,17 @@ class Contact(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    
+    linkedin = models.URLField(blank=True)
+    github = models.URLField(blank=True)
+    facebook = models.URLField(blank=True)
+    instagram = models.URLField(blank=True)
+    twitter = models.URLField(blank=True)
+    tiktok = models.URLField(blank=True)
+    youtube = models.URLField(blank=True)
+    telegram = models.URLField(blank=True)
+    discord = models.CharField(max_length=100, blank=True)
+    custom_social_profiles = models.JSONField(default=list, blank=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -187,32 +198,20 @@ class Contact(models.Model):
         self.deleted_at = timezone.now()
         self.save()
 
-
-class SocialProfile(models.Model):
-    SOCIAL_NETWORKS = [
-        ('LINKEDIN', 'LinkedIn'),
-        ('GITHUB', 'GitHub'),
-        ('FACEBOOK', 'Facebook'),
-        ('INSTAGRAM', 'Instagram'),
-        ('TWITTER', 'Twitter/X'),
-        ('TIKTOK', 'TikTok'),
-        ('YOUTUBE', 'YouTube'),
-        ('TELEGRAM', 'Telegram'),
-        ('DISCORD', 'Discord'),
-        ('OTHER', 'Other'),
-    ]
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='social_profiles')
-    network = models.CharField(max_length=20, choices=SOCIAL_NETWORKS)
-    url = models.URLField()
-    username = models.CharField(max_length=100, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['network']
-
-    def __str__(self):
-        return f"{self.contact} - {self.network}"
+    def get_socials(self):
+        return {
+            'linkedin': self.linkedin,
+            'github': self.github,
+            'facebook': self.facebook,
+            'instagram': self.instagram,
+            'twitter': self.twitter,
+            'tiktok': self.tiktok,
+            'youtube': self.youtube,
+            'telegram': self.telegram,
+            'discord': self.discord,
+            'custom': self.custom_social_profiles,
+            'has_any': bool(self.linkedin or self.github or self.facebook or self.instagram or self.twitter or self.tiktok or self.youtube or self.telegram or self.discord or self.custom_social_profiles)
+        }
 
 
 class ContactCompanyRelationship(models.Model):

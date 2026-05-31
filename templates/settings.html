@@ -1,86 +1,22 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Settings - CRM{% endblock %}
 
 {% block body %}
 <div class="flex min-h-screen bg-neutral-900">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col">
-        <div class="p-6 border-b border-neutral-800">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
-                <span class="text-lg font-bold text-white">CRM</span>
-            </div>
-        </div>
-
-        <nav class="flex-1 p-4">
-            <ul class="space-y-1">
-                <li>
-                    <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-neutral-800">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                        </svg>
-                        <span class="text-sm font-medium">Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'contacts' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-neutral-800">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Contacts</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-neutral-800">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                        <span class="text-sm font-medium">Companies</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'settings' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-purple-600/10 text-purple-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Settings</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <div class="p-4 border-t border-neutral-800">
-            <a href="{% url 'settings' %}" class="flex items-center gap-3">
-                {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" class="w-9 h-9 rounded-full object-cover" alt="{{ user.get_full_name }}">
-                {% else %}
-                <div class="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center text-white text-sm font-medium">
-                    {{ user.first_name.0|default:user.username.0|upper }}
-                </div>
-                {% endif %}
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-white truncate">{{ user.get_full_name }}</p>
-                    <p class="text-xs text-gray-400 capitalize">{{ user.role|lower }}</p>
-                </div>
-            </a>
-        </div>
-    </aside>
+    {% include 'includes/sidebar.html' %}
 
     <!-- Main Content -->
     <main class="flex-1">
         <header class="bg-neutral-800 border-b border-neutral-700 px-6 py-4">
-            <div class="flex items-center gap-4">
+            <div class="max-w-2xl mx-auto flex items-center gap-4">
                 <h1 class="text-xl font-semibold text-white">Settings</h1>
             </div>
         </header>
 
         <div class="p-6">
+            <div class="max-w-2xl mx-auto">
             {% if messages %}
                 {% for message in messages %}
                     <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">
@@ -89,7 +25,7 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="max-w-2xl space-y-6">
+            <div class="space-y-6">
                 <!-- Profile Picture Section -->
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
                     <h3 class="text-lg font-semibold text-white mb-6">Profile Picture</h3>
@@ -179,261 +115,23 @@
                     </form>
                 </div>
             </div>
+            </div>
         </div>
     </main>
 </div>
 
 <!-- Hidden file input -->
-<input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="handleImageSelect(this)">
+<input type="file" id="avatarInput" accept="image/*" class="hidden">
 
 <!-- Cropper Modal -->
-<div id="cropperModal" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center hidden">
-    <div class="bg-neutral-800 rounded-xl p-6 max-w-lg w-full mx-4">
-        <h3 class="text-lg font-semibold text-white mb-2">Crop Your Photo</h3>
-        <p class="text-gray-400 text-sm mb-4">Drag the image to adjust which part will be cropped to a square.</p>
-        
-        <div class="bg-neutral-900 rounded-lg overflow-hidden mb-4 relative" id="cropperContainer" style="width: 100%; height: 300px;">
-            <div id="cropOverlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10;"></div>
-            <img id="cropperImage" class="cursor-move" style="position: absolute; transform-origin: center center;">
-        </div>
-        
-        <div class="flex justify-end gap-3">
-            <button type="button" onclick="closeCropper()" class="px-6 py-2 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors">
-                Cancel
-            </button>
-            <button type="button" onclick="saveCrop()" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
-                Save Photo
-            </button>
-        </div>
-    </div>
-</div>
+{% include 'includes/cropper-modal.html' %}
 
+<script src="{% static 'js/avatar-crop.js' %}"></script>
 <script>
-let cropState = {
-    img: null,
-    container: null,
-    dragStartX: 0,
-    dragStartY: 0,
-    imgPosX: 0,
-    imgPosY: 0,
-    imgWidth: 0,
-    imgHeight: 0,
-    containerWidth: 0,
-    containerHeight: 0,
-    scale: 1
-};
+document.getElementById('avatarInput').addEventListener('change', function() {
+    handleImageSelect(this, 'avatarPreview', 'cropX', 'cropY', 'cropSize', "{% url 'settings' %}", "{{ csrf_token }}");
+});
 
-function handleImageSelect(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById('cropperImage');
-            img.src = e.target.result;
-            img.onload = function() {
-                openCropper();
-            };
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-function openCropper() {
-    const modal = document.getElementById('cropperModal');
-    const container = document.getElementById('cropperContainer');
-    const img = document.getElementById('cropperImage');
-    
-    modal.classList.remove('hidden');
-    
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
-    
-    const imgWidth = img.naturalWidth;
-    const imgHeight = img.naturalHeight;
-    
-    // Calculate scale to fit container while maintaining aspect ratio
-    const scaleX = containerWidth / imgWidth;
-    const scaleY = containerHeight / imgHeight;
-    const scale = Math.min(scaleX, scaleY);
-    
-    const scaledWidth = imgWidth * scale;
-    const scaledHeight = imgHeight * scale;
-    
-    // Store state
-    cropState.img = img;
-    cropState.container = container;
-    cropState.containerWidth = containerWidth;
-    cropState.containerHeight = containerHeight;
-    cropState.imgWidth = scaledWidth;
-    cropState.imgHeight = scaledHeight;
-    cropState.scale = scale;
-    cropState.imgPosX = (containerWidth - scaledWidth) / 2;
-    cropState.imgPosY = (containerHeight - scaledHeight) / 2;
-    
-    // Apply styles
-    img.style.width = scaledWidth + 'px';
-    img.style.height = scaledHeight + 'px';
-    img.style.left = cropState.imgPosX + 'px';
-    img.style.top = cropState.imgPosY + 'px';
-    
-    // Add drag events
-    img.addEventListener('mousedown', startDrag);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', endDrag);
-    
-    // Touch events
-    img.addEventListener('touchstart', startDragTouch, {passive: false});
-    document.addEventListener('touchmove', dragTouch, {passive: false});
-    document.addEventListener('touchend', endDrag);
-    
-    // Draw crop overlay
-    drawCropOverlay();
-}
-
-function drawCropOverlay() {
-    const overlay = document.getElementById('cropOverlay');
-    const containerWidth = cropState.containerWidth;
-    const containerHeight = cropState.containerHeight;
-    const cropSize = Math.min(containerWidth, containerHeight) - 40;
-    
-    const cropLeft = (containerWidth - cropSize) / 2;
-    const cropTop = (containerHeight - cropSize) / 2;
-    
-    overlay.innerHTML = `
-        <div style="position: absolute; top: 0; left: 0; width: ${cropLeft}px; height: 100%; background: rgba(0,0,0,0.6);"></div>
-        <div style="position: absolute; top: 0; right: 0; width: ${containerWidth - cropLeft - cropSize}px; height: 100%; background: rgba(0,0,0,0.6);"></div>
-        <div style="position: absolute; top: 0; left: ${cropLeft}px; width: ${cropSize}px; height: ${cropTop}px; background: rgba(0,0,0,0.6);"></div>
-        <div style="position: absolute; bottom: 0; left: ${cropLeft}px; width: ${cropSize}px; height: ${containerHeight - cropTop - cropSize}px; background: rgba(0,0,0,0.6);"></div>
-        <div style="position: absolute; top: ${cropTop}px; left: ${cropLeft}px; width: ${cropSize}px; height: ${cropSize}px; border: 2px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,0.5);"></div>
-    `;
-}
-
-function startDrag(e) {
-    e.preventDefault();
-    cropState.dragStartX = e.clientX;
-    cropState.dragStartY = e.clientY;
-}
-
-function drag(e) {
-    if (cropState.dragStartX === 0 && cropState.dragStartY === 0) return;
-    
-    const deltaX = e.clientX - cropState.dragStartX;
-    const deltaY = e.clientY - cropState.dragStartY;
-    
-    let newX = cropState.imgPosX + deltaX;
-    let newY = cropState.imgPosY + deltaY;
-    
-    // Calculate bounds so image stays viewable
-    const minX = cropState.containerWidth - cropState.imgWidth;
-    const minY = cropState.containerHeight - cropState.imgHeight;
-    const maxX = 0;
-    const maxY = 0;
-    
-    newX = Math.max(minX, Math.min(maxX, newX));
-    newY = Math.max(minY, Math.min(maxY, newY));
-    
-    cropState.img.style.left = newX + 'px';
-    cropState.img.style.top = newY + 'px';
-    
-    cropState.imgPosX = newX;
-    cropState.imgPosY = newY;
-    
-    cropState.dragStartX = e.clientX;
-    cropState.dragStartY = e.clientY;
-}
-
-function endDrag() {
-    cropState.dragStartX = 0;
-    cropState.dragStartY = 0;
-}
-
-function startDragTouch(e) {
-    e.preventDefault();
-    if (e.touches.length === 1) {
-        cropState.dragStartX = e.touches[0].clientX;
-        cropState.dragStartY = e.touches[0].clientY;
-    }
-}
-
-function dragTouch(e) {
-    if (cropState.dragStartX === 0 && cropState.dragStartY === 0) return;
-    if (e.touches.length !== 1) return;
-    
-    e.preventDefault();
-    
-    const deltaX = e.touches[0].clientX - cropState.dragStartX;
-    const deltaY = e.touches[0].clientY - cropState.dragStartY;
-    
-    let newX = cropState.imgPosX + deltaX;
-    let newY = cropState.imgPosY + deltaY;
-    
-    const minX = cropState.containerWidth - cropState.imgWidth;
-    const minY = cropState.containerHeight - cropState.imgHeight;
-    const maxX = 0;
-    const maxY = 0;
-    
-    newX = Math.max(minX, Math.min(maxX, newX));
-    newY = Math.max(minY, Math.min(maxY, newY));
-    
-    cropState.img.style.left = newX + 'px';
-    cropState.img.style.top = newY + 'px';
-    
-    cropState.imgPosX = newX;
-    cropState.imgPosY = newY;
-    
-    cropState.dragStartX = e.touches[0].clientX;
-    cropState.dragStartY = e.touches[0].clientY;
-}
-
-function closeCropper() {
-    document.getElementById('cropperModal').classList.add('hidden');
-    document.getElementById('avatarInput').value = '';
-    
-    // Remove event listeners
-    if (cropState.img) {
-        cropState.img.removeEventListener('mousedown', startDrag);
-        cropState.img.removeEventListener('touchstart', startDragTouch);
-    }
-    document.removeEventListener('mousemove', drag);
-    document.removeEventListener('touchmove', dragTouch);
-    document.removeEventListener('mouseup', endDrag);
-    document.removeEventListener('touchend', endDrag);
-}
-
-function saveCrop() {
-    // Calculate crop offset as percentage
-    const containerCenterX = cropState.containerWidth / 2;
-    const containerCenterY = cropState.containerHeight / 2;
-    const imgCenterX = cropState.imgPosX + cropState.imgWidth / 2;
-    const imgCenterY = cropState.imgPosY + cropState.imgHeight / 2;
-    
-    const offsetX = ((containerCenterX - imgCenterX) / cropState.imgWidth) * 100;
-    const offsetY = ((containerCenterY - imgCenterY) / cropState.imgHeight) * 100;
-    
-    // Get file and submit
-    const fileInput = document.getElementById('avatarInput');
-    if (!fileInput.files[0]) {
-        closeCropper();
-        return;
-    }
-    
-    const formData = new FormData();
-    formData.append('avatar', fileInput.files[0]);
-    formData.append('crop_x', offsetX.toFixed(4));
-    formData.append('crop_y', offsetY.toFixed(4));
-    
-    fetch('{% url "settings" %}', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-        }
-    })
-    .then(response => {
-        window.location.reload();
-    })
-    .catch(error => {
-        window.location.reload();
-    });
-}
+document.getElementById('cropSaveBtn').addEventListener('click', saveCropAjax);
 </script>
 {% endblock %}

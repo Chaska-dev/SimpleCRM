@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import / Export - CRM{% endblock %}
+
+{% block body %}
+<div class="flex min-h-screen bg-neutral-900">
+    {% include 'includes/sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        <header class="bg-neutral-800 border-b border-neutral-700 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-xl font-semibold text-white">Import / Export Contacts</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Import Section -->
+                <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Import Contacts</h3>
+                            <p class="text-sm text-gray-400">Upload a file to import contacts</p>
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" action="{% url 'import-export' %}" class="space-y-4" id="import-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="import">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Select File Format</label>
+                            <select name="file_format" id="import-format" class="w-full px-4 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-gray-300 focus:outline-none focus:border-purple-500">
+                                <option value="csv">CSV (Comma Separated Values)</option>
+                                <option value="xlsx">Excel (.xlsx)</option>
+                                <option value="vcf">vCard (.vcf)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Select File</label>
+                            <div class="border-2 border-dashed border-neutral-700 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
+                                <input type="file" name="file" id="import-file" required>
+                                <label for="import-file" class="cursor-pointer">
+                                    <svg class="w-10 h-10 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                    </svg>
+                                    <p class="text-sm text-gray-400">Click to select or drag and drop</p>
+                                    <p class="text-xs text-gray-500 mt-1">CSV, XLSX, or VCF files</p>
+                                </label>
+                                <p id="file-name" class="mt-3 text-sm text-purple-400 hidden"></p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            Import Contacts
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Export Section -->
+                <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Export Contacts</h3>
+                            <p class="text-sm text-gray-400">Download all your contacts</p>
+                        </div>
+                    </div>
+
+                    <form method="post" action="{% url 'import-export' %}" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="export">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Select Export Format</label>
+                            <select name="export_format" class="w-full px-4 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-gray-300 focus:outline-none focus:border-purple-500">
+                                <option value="csv">CSV (Comma Separated Values)</option>
+                                <option value="xlsx">Excel (.xlsx)</option>
+                                <option value="vcf">vCard (.vcf)</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+
+                        <div class="p-4 bg-neutral-900/50 rounded-lg">
+                            <p class="text-sm text-gray-400">This will export all <span class="text-purple-400 font-medium">{{ contacts_count|default:0 }}</span> contacts from your workspace.</p>
+                        </div>
+
+                        <button type="submit" class="w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            Export Contacts
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mt-6 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Format Help -->
+            <div class="mt-8 bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Supported Formats</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="p-4 bg-neutral-900/50 rounded-lg">
+                        <h4 class="text-sm font-medium text-white mb-1">CSV</h4>
+                        <p class="text-xs text-gray-400">Comma-separated values. Best for spreadsheet compatibility.</p>
+                    </div>
+                    <div class="p-4 bg-neutral-900/50 rounded-lg">
+                        <h4 class="text-sm font-medium text-white mb-1">Excel (.xlsx)</h4>
+                        <p class="text-xs text-gray-400">Microsoft Excel format. Good for large datasets.</p>
+                    </div>
+                    <div class="p-4 bg-neutral-900/50 rounded-lg">
+                        <h4 class="text-sm font-medium text-white mb-1">vCard (.vcf)</h4>
+                        <p class="text-xs text-gray-400">Standard contact format. Compatible with most apps.</p>
+                    </div>
+                    <div class="p-4 bg-neutral-900/50 rounded-lg">
+                        <h4 class="text-sm font-medium text-white mb-1">JSON</h4>
+                        <p class="text-xs text-gray-400">Machine-readable format. Best for developers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('import-format').addEventListener('change', function() {
+    const fileInput = document.getElementById('import-file');
+    const format = this.value;
+    const extensions = {
+        'csv': '.csv',
+        'xlsx': '.xlsx',
+        'vcf': '.vcf'
+    };
+    fileInput.accept = extensions[format];
+});
+
+document.getElementById('import-file').addEventListener('change', function() {
+    const fileName = this.files[0]?.name || '';
+    document.getElementById('file-name').textContent = fileName;
+    document.getElementById('file-name').classList.toggle('hidden', !fileName);
+});
+</script>
+{% endblock %}
