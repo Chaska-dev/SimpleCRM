@@ -8,17 +8,8 @@
     {% include 'includes/sidebar.html' %}
 
     <!-- Main Content -->
-    <main class="flex-1">
-        <header class="bg-neutral-800 border-b border-neutral-700 px-6 py-4">
-            <div class="flex items-center gap-4">
-                <a href="{% url 'contacts' %}" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-neutral-700">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                </a>
-                <h1 class="text-xl font-semibold text-white">Edit Contact</h1>
-            </div>
-        </header>
+    <main class="flex-1 ml-64 transition-all duration-300">
+        {% include 'includes/navbar.html' with back_url='contacts' navbar_title='Edit Contact' %}
 
         <div class="p-6">
             <div class="max-w-6xl">
@@ -118,25 +109,33 @@
                             <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4">
                                 <h3 class="text-sm font-semibold text-white mb-4">Job & Location</h3>
                                 <div class="space-y-3">
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-400 mb-1">Job Title</label>
-                                        <input type="text" name="job_title" value="{{ contact.job_title }}" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500">
+                                    <div class="relative">
+                                        <label class="block text-xs font-medium text-gray-400 mb-1">Company</label>
+                                        <input type="text" name="company" id="companyInput" value="{{ contact.company.name|default:'' }}" autocomplete="off" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500" placeholder="Type to search or create...">
+                                        <div id="companyDropdown" class="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                                        </div>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-400 mb-1">Website</label>
                                         <input type="url" name="website" value="{{ contact.website }}" placeholder="https://" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500">
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-400 mb-1">City</label>
-                                        <input type="text" name="city" value="{{ contact.city }}" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-400 mb-1">State</label>
-                                        <input type="text" name="state" value="{{ contact.state }}" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500">
-                                    </div>
-                                    <div>
+                                    <div class="relative">
                                         <label class="block text-xs font-medium text-gray-400 mb-1">Country</label>
-                                        <input type="text" name="country" value="{{ contact.country }}" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500">
+                                        <input type="text" name="country" id="countryInput" value="{{ contact.country.name|default:'' }}" autocomplete="off" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500" placeholder="Type to search...">
+                                        <input type="hidden" name="country_id" id="countryId" value="{{ contact.country.id|default:'' }}">
+                                        <div id="countryDropdown" class="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
+                                    </div>
+                                    <div class="relative">
+                                        <label class="block text-xs font-medium text-gray-400 mb-1">State</label>
+                                        <input type="text" name="state" id="stateInput" value="{{ contact.state.name|default:'' }}" autocomplete="off" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500" placeholder="Select country first...">
+                                        <input type="hidden" name="state_id" id="stateId" value="{{ contact.state.id|default:'' }}">
+                                        <div id="stateDropdown" class="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
+                                    </div>
+                                    <div class="relative">
+                                        <label class="block text-xs font-medium text-gray-400 mb-1">City</label>
+                                        <input type="text" name="city" id="cityInput" value="{{ contact.city.name|default:'' }}" autocomplete="off" class="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500" placeholder="Select state first...">
+                                        <input type="hidden" name="city_id" id="cityId" value="{{ contact.city.id|default:'' }}">
+                                        <div id="cityDropdown" class="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-600 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-400 mb-1">Address</label>
@@ -278,5 +277,308 @@ document.getElementById('avatarInput').addEventListener('change', function() {
 });
 
 document.getElementById('cropSaveBtn').addEventListener('click', saveCropDirect);
+
+const companyInput = document.getElementById('companyInput');
+const companyDropdown = document.getElementById('companyDropdown');
+let selectedIndex = -1;
+
+async function loadCompanies(query = '') {
+    const response = await fetch(`/api/companies/search/?q=${encodeURIComponent(query)}`);
+    const companies = await response.json();
+    companyDropdown.innerHTML = '';
+
+    if (companies.length === 0 && query.trim() === '') {
+        companyDropdown.classList.add('hidden');
+        return;
+    }
+
+    companies.forEach((company, index) => {
+        const div = document.createElement('div');
+        div.className = 'px-3 py-2 text-white cursor-pointer hover:bg-neutral-700';
+        div.textContent = company.name;
+        div.addEventListener('click', () => {
+            companyInput.value = company.name;
+            companyDropdown.classList.add('hidden');
+        });
+        companyDropdown.appendChild(div);
+    });
+
+    if (query.trim() !== '' && !companies.some(c => c.name.toLowerCase() === query.toLowerCase())) {
+        const createDiv = document.createElement('div');
+        createDiv.className = 'px-3 py-2 text-purple-400 cursor-pointer hover:bg-neutral-700 border-t border-neutral-600';
+        createDiv.textContent = `+ Create "${query}"`;
+        createDiv.addEventListener('click', () => {
+            companyInput.value = query;
+            companyDropdown.classList.add('hidden');
+        });
+        companyDropdown.appendChild(createDiv);
+    }
+
+    companyDropdown.classList.remove('hidden');
+    selectedIndex = -1;
+}
+
+companyInput.addEventListener('input', function() {
+    loadCompanies(this.value);
+});
+
+companyInput.addEventListener('focus', function() {
+    loadCompanies(this.value);
+});
+
+companyInput.addEventListener('keydown', function(e) {
+    const items = companyDropdown.querySelectorAll('div');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === selectedIndex));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, 0);
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === selectedIndex));
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+        e.preventDefault();
+        items[selectedIndex].click();
+    } else if (e.key === 'Escape') {
+        companyDropdown.classList.add('hidden');
+    }
+});
+
+document.addEventListener('click', function(e) {
+    if (!companyInput.contains(e.target) && !companyDropdown.contains(e.target)) {
+        companyDropdown.classList.add('hidden');
+    }
+});
+
+// Location Dropdowns (Country -> State -> City)
+const countryInput = document.getElementById('countryInput');
+const countryDropdown = document.getElementById('countryDropdown');
+const countryIdInput = document.getElementById('countryId');
+const stateInput = document.getElementById('stateInput');
+const stateDropdown = document.getElementById('stateDropdown');
+const stateIdInput = document.getElementById('stateId');
+const cityInput = document.getElementById('cityInput');
+const cityDropdown = document.getElementById('cityDropdown');
+const cityIdInput = document.getElementById('cityId');
+
+// Load countries
+function loadCountries(query) {
+    fetch(`/api/locations/countries/?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(countries => {
+            countryDropdown.innerHTML = '';
+            countries.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 text-white cursor-pointer hover:bg-neutral-700';
+                div.textContent = c.name;
+                div.dataset.value = c.id;
+                div.addEventListener('click', () => {
+                    countryInput.value = c.name;
+                    countryIdInput.value = c.id;
+                    countryDropdown.classList.add('hidden');
+                    stateInput.value = '';
+                    stateIdInput.value = '';
+                    cityInput.value = '';
+                    cityIdInput.value = '';
+                    stateInput.disabled = false;
+                    stateInput.placeholder = 'Type to search states...';
+                    cityInput.disabled = true;
+                    cityInput.placeholder = 'Select state first...';
+                });
+                countryDropdown.appendChild(div);
+            });
+            if (query.trim() && !countries.some(c => c.name.toLowerCase() === query.toLowerCase())) {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 text-purple-400 cursor-pointer hover:bg-neutral-700 border-t border-neutral-600';
+                div.textContent = `+ Create "${query}"`;
+                div.addEventListener('click', () => {
+                    countryInput.value = query;
+                    countryIdInput.value = '';
+                    countryDropdown.classList.add('hidden');
+                    stateInput.value = '';
+                    stateIdInput.value = '';
+                    cityInput.value = '';
+                    cityIdInput.value = '';
+                    stateInput.disabled = false;
+                    cityInput.disabled = true;
+                    cityInput.placeholder = 'Select state first...';
+                });
+                countryDropdown.appendChild(div);
+            }
+            countryDropdown.classList.remove('hidden');
+        });
+}
+
+// Load states
+function loadStates(countryId, query) {
+    const url = countryId
+        ? `/api/locations/states/?country=${countryId}&q=${encodeURIComponent(query)}`
+        : `/api/locations/states/?q=${encodeURIComponent(query)}`;
+    fetch(url)
+        .then(r => r.json())
+        .then(states => {
+            stateDropdown.innerHTML = '';
+            states.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 text-white cursor-pointer hover:bg-neutral-700';
+                div.textContent = s.name;
+                div.dataset.value = s.id;
+                div.addEventListener('click', () => {
+                    stateInput.value = s.name;
+                    stateIdInput.value = s.id;
+                    stateDropdown.classList.add('hidden');
+                    cityInput.value = '';
+                    cityIdInput.value = '';
+                    cityInput.disabled = false;
+                    cityInput.placeholder = 'Type to search cities...';
+                });
+                stateDropdown.appendChild(div);
+            });
+            if (query.trim() && !states.some(s => s.name.toLowerCase() === query.toLowerCase())) {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 text-purple-400 cursor-pointer hover:bg-neutral-700 border-t border-neutral-600';
+                div.textContent = `+ Create "${query}"`;
+                div.addEventListener('click', () => {
+                    stateInput.value = query;
+                    stateIdInput.value = '';
+                    stateDropdown.classList.add('hidden');
+                    cityInput.value = '';
+                    cityIdInput.value = '';
+                    cityInput.disabled = false;
+                });
+                stateDropdown.appendChild(div);
+            }
+            stateDropdown.classList.remove('hidden');
+        });
+}
+
+// Load cities
+function loadCities(stateId, query) {
+    const url = stateId
+        ? `/api/locations/cities/?state=${stateId}&q=${encodeURIComponent(query)}`
+        : `/api/locations/cities/?q=${encodeURIComponent(query)}`;
+    fetch(url)
+        .then(r => r.json())
+        .then(cities => {
+            cityDropdown.innerHTML = '';
+            cities.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 text-white cursor-pointer hover:bg-neutral-700';
+                div.textContent = c.name;
+                div.dataset.value = c.id;
+                div.addEventListener('click', () => {
+                    cityInput.value = c.name;
+                    cityIdInput.value = c.id;
+                    cityDropdown.classList.add('hidden');
+                });
+                cityDropdown.appendChild(div);
+            });
+            if (query.trim() && !cities.some(c => c.name.toLowerCase() === query.toLowerCase())) {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 text-purple-400 cursor-pointer hover:bg-neutral-700 border-t border-neutral-600';
+                div.textContent = `+ Create "${query}"`;
+                div.addEventListener('click', () => {
+                    cityInput.value = query;
+                    cityIdInput.value = '';
+                    cityDropdown.classList.add('hidden');
+                });
+                cityDropdown.appendChild(div);
+            }
+            cityDropdown.classList.remove('hidden');
+        });
+}
+
+// Country events
+countryInput.addEventListener('input', function() { loadCountries(this.value); });
+countryInput.addEventListener('focus', function() { loadCountries(this.value); });
+countryInput.addEventListener('keydown', function(e) {
+    const items = countryDropdown.querySelectorAll('div[data-value]');
+    if (items.length === 0) return;
+    if (e.key === 'Escape') { countryDropdown.classList.add('hidden'); return; }
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const current = parseInt(countryDropdown.dataset.selected) || -1;
+        const next = Math.min(current + 1, items.length - 1);
+        countryDropdown.dataset.selected = next;
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === next));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const current = parseInt(countryDropdown.dataset.selected) || 0;
+        const prev = Math.max(current - 1, 0);
+        countryDropdown.dataset.selected = prev;
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === prev));
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = countryDropdown.querySelector('div.bg-neutral-700');
+        if (selected) selected.click();
+    }
+});
+
+// State events
+stateInput.addEventListener('input', function() { loadStates(countryIdInput.value, this.value); });
+stateInput.addEventListener('focus', function() { loadStates(countryIdInput.value, this.value); });
+stateInput.addEventListener('keydown', function(e) {
+    const items = stateDropdown.querySelectorAll('div[data-value]');
+    if (items.length === 0) return;
+    if (e.key === 'Escape') { stateDropdown.classList.add('hidden'); return; }
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const current = parseInt(stateDropdown.dataset.selected) || -1;
+        const next = Math.min(current + 1, items.length - 1);
+        stateDropdown.dataset.selected = next;
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === next));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const current = parseInt(stateDropdown.dataset.selected) || 0;
+        const prev = Math.max(current - 1, 0);
+        stateDropdown.dataset.selected = prev;
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === prev));
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = stateDropdown.querySelector('div.bg-neutral-700');
+        if (selected) selected.click();
+    }
+});
+
+// City events
+cityInput.addEventListener('input', function() { loadCities(stateIdInput.value, this.value); });
+cityInput.addEventListener('focus', function() { loadCities(stateIdInput.value, this.value); });
+cityInput.addEventListener('keydown', function(e) {
+    const items = cityDropdown.querySelectorAll('div[data-value]');
+    if (items.length === 0) return;
+    if (e.key === 'Escape') { cityDropdown.classList.add('hidden'); return; }
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const current = parseInt(cityDropdown.dataset.selected) || -1;
+        const next = Math.min(current + 1, items.length - 1);
+        cityDropdown.dataset.selected = next;
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === next));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const current = parseInt(cityDropdown.dataset.selected) || 0;
+        const prev = Math.max(current - 1, 0);
+        cityDropdown.dataset.selected = prev;
+        items.forEach((item, i) => item.classList.toggle('bg-neutral-700', i === prev));
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = cityDropdown.querySelector('div.bg-neutral-700');
+        if (selected) selected.click();
+    }
+});
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+    if (!countryInput.contains(e.target) && !countryDropdown.contains(e.target)) {
+        countryDropdown.classList.add('hidden');
+    }
+    if (!stateInput.contains(e.target) && !stateDropdown.contains(e.target)) {
+        stateDropdown.classList.add('hidden');
+    }
+    if (!cityInput.contains(e.target) && !cityDropdown.contains(e.target)) {
+        cityDropdown.classList.add('hidden');
+    }
+});
 </script>
 {% endblock %}

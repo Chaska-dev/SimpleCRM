@@ -8,15 +8,11 @@
     {% include 'includes/sidebar.html' %}
 
     <!-- Main Content -->
-    <main class="flex-1">
-        <header class="bg-neutral-800 border-b border-neutral-700 px-6 py-4">
-            <div class="max-w-2xl mx-auto flex items-center gap-4">
-                <h1 class="text-xl font-semibold text-white">Settings</h1>
-            </div>
-        </header>
+    <main class="flex-1 ml-64 transition-all duration-300">
+        {% include 'includes/navbar.html' with navbar_title='Settings' %}
 
         <div class="p-6">
-            <div class="max-w-2xl mx-auto">
+            <div class="max-w-full mx-auto">
             {% if messages %}
                 {% for message in messages %}
                     <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">

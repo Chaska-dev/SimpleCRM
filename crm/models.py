@@ -156,12 +156,12 @@ class Contact(models.Model):
     work_email = models.EmailField(blank=True)
     personal_phone = models.CharField(max_length=20, blank=True)
     work_phone = models.CharField(max_length=20, blank=True)
-    job_title = models.CharField(max_length=100, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='contacts')
     notes = models.TextField(blank=True)
     address = models.TextField(blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    state = models.CharField(max_length=100, blank=True)
-    country = models.CharField(max_length=100, blank=True)
+    country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True, blank=True, related_name='contacts')
+    state = models.ForeignKey('State', on_delete=models.SET_NULL, null=True, blank=True, related_name='contacts')
+    city = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, blank=True, related_name='contacts')
     website = models.URLField(blank=True)
     avatar = models.ImageField(upload_to='contacts/avatars/', blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name='contacts')
@@ -325,3 +325,56 @@ class CustomFieldValue(models.Model):
 
     def __str__(self):
         return f"{self.custom_field.name} - {self.object_id}"
+
+
+class Country(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name_es = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100)
+    code = models.CharField(max_length=3)  # ISO code like CHL, MEX, USA
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name_es']
+        verbose_name_plural = 'countries'
+
+    def __str__(self):
+        return self.name_es
+
+    def get_name(self, lang='es'):
+        return self.name_en if lang == 'en' else self.name_es
+
+
+class State(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='states')
+    name_es = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100)
+    code = models.CharField(max_length=10, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name_es']
+
+    def __str__(self):
+        return self.name_es
+
+    def get_name(self, lang='es'):
+        return self.name_en if lang == 'en' else self.name_es
+
+
+class City(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities')
+    name_es = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name_es']
+
+    def __str__(self):
+        return self.name_es
+
+    def get_name(self, lang='es'):
+        return self.name_en if lang == 'en' else self.name_es

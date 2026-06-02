@@ -1,62 +1,67 @@
-<aside class="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col">
-    <div class="p-6 border-b border-neutral-800">
-        <div class="flex items-center gap-3">
+<aside id="sidebar" class="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col fixed left-0 top-0 h-screen z-50 transition-all duration-300">
+    <div class="p-4 border-b border-neutral-800 flex justify-center items-center">
+        <div id="sidebar-logo" class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
             </div>
-            <span class="text-lg font-bold text-white">CRM</span>
+            <span id="sidebar-title" class="text-lg font-bold text-white">CRM</span>
         </div>
+        <button id="sidebar-toggle" class="w-6 h-6 text-gray-400 hover:text-white transition-colors absolute right-4">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+        </button>
     </div>
 
     <nav class="flex-1 p-4">
-        <ul class="space-y-1">
+        <ul id="sidebar-nav" class="space-y-1">
             <li>
-                <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg {% if request.resolver_match.url_name == 'dashboard' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 h-11 rounded-lg {% if request.resolver_match.url_name == 'dashboard' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
-                    <span class="text-sm font-medium">Dashboard</span>
+                    <span class="text-sm font-medium sidebar-text">Dashboard</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'contacts' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg {% if request.resolver_match.url_name == 'contacts' or request.resolver_match.url_name == 'contact-create' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
+                <a href="{% url 'contacts' %}" class="flex items-center gap-3 px-4 h-11 rounded-lg {% if request.resolver_match.url_name == 'contacts' or request.resolver_match.url_name == 'contact-create' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
-                    <span class="text-sm font-medium">Contacts</span>
+                    <span class="text-sm font-medium sidebar-text">Contacts</span>
                 </a>
             </li>
             <li>
-                <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-neutral-800">
+                <a href="{% url 'companies' %}" class="flex items-center gap-3 px-4 h-11 rounded-lg text-gray-400 hover:text-white hover:bg-neutral-800">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                    <span class="text-sm font-medium">Companies</span>
+                    <span class="text-sm font-medium sidebar-text">Companies</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'settings' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg {% if request.resolver_match.url_name == 'settings' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
+                <a href="{% url 'import-export' %}" class="flex items-center gap-3 px-4 h-11 rounded-lg {% if request.resolver_match.url_name == 'import-export' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    <span class="text-sm font-medium sidebar-text">Import / Export</span>
+                </a> 
+            </li>
+            <li>
+                <a href="{% url 'settings' %}" class="flex items-center gap-3 px-4 h-11 rounded-lg {% if request.resolver_match.url_name == 'settings' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
-                    <span class="text-sm font-medium">Settings</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'import-export' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg {% if request.resolver_match.url_name == 'import-export' %}bg-purple-600/10 text-purple-400{% else %}text-gray-400 hover:text-white hover:bg-neutral-800{% endif %}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                    </svg>
-                    <span class="text-sm font-medium">Import / Export</span>
+                    <span class="text-sm font-medium sidebar-text">Settings</span>
                 </a>
             </li>
         </ul>
     </nav>
 
-    <div class="p-4 border-t border-neutral-800">
+    <div id="sidebar-user" class="p-4 border-t border-neutral-800 h-16 flex items-center">
         <a href="{% url 'settings' %}" class="flex items-center gap-3">
             {% if user.avatar %}
             <img src="{{ user.avatar.url }}" class="w-9 h-9 rounded-full object-cover" alt="{{ user.get_full_name }}">
@@ -72,3 +77,76 @@
         </a>
     </div>
 </aside>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const title = document.getElementById('sidebar-title');
+    const logo = document.getElementById('sidebar-logo');
+    const nav = document.getElementById('sidebar-nav');
+    const userSection = document.getElementById('sidebar-user');
+    const navItems = nav.querySelectorAll('a');
+    const sidebarTextElements = document.querySelectorAll('.sidebar-text');
+    
+    let isCollapsed = false;
+    
+    function updateMainContentMargin() {
+        document.querySelectorAll('main').forEach(function(main) {
+            if (isCollapsed) {
+                main.classList.remove('ml-64');
+                main.classList.add('ml-16');
+            } else {
+                main.classList.remove('ml-16');
+                main.classList.add('ml-64');
+            }
+        });
+    }
+    
+    toggleBtn.addEventListener('click', function() {
+        isCollapsed = !isCollapsed;
+        
+        if (isCollapsed) {
+            sidebar.classList.remove('w-64');
+            sidebar.classList.add('w-16');
+            logo.style.display = 'none';
+            userSection.style.display = 'none';
+            
+            navItems.forEach(function(item) {
+                item.classList.add('justify-center');
+                item.classList.remove('px-4');
+                item.classList.add('px-0');
+            });
+            
+            sidebarTextElements.forEach(function(el) {
+                el.style.display = 'none';
+            });
+            
+            toggleBtn.classList.remove('absolute', 'right-4');
+            toggleBtn.classList.add('mx-auto');
+            toggleBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>';
+        } else {
+            sidebar.classList.remove('w-16');
+            sidebar.classList.add('w-64');
+            logo.style.display = 'flex';
+            userSection.style.display = 'block';
+            
+            navItems.forEach(function(item) {
+                item.classList.remove('justify-center');
+                item.classList.add('px-4');
+                item.classList.remove('px-0');
+            });
+            
+            sidebarTextElements.forEach(function(el) {
+                el.style.display = 'inline';
+            });
+            
+            toggleBtn.classList.add('absolute', 'right-4');
+            toggleBtn.classList.remove('mx-auto');
+            toggleBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>';
+        }
+        
+        updateMainContentMargin();
+    });
+});
+</script>

@@ -8,14 +8,8 @@
     {% include 'includes/sidebar.html' %}
 
     <!-- Main Content -->
-    <main class="flex-1">
-        <header class="bg-neutral-800 border-b border-neutral-700 px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <h1 class="text-xl font-semibold text-white">Import / Export Contacts</h1>
-                </div>
-            </div>
-        </header>
+    <main class="flex-1 ml-64 transition-all duration-300">
+        {% include 'includes/navbar.html' with navbar_title='Import / Export Contacts' %}
 
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

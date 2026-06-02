@@ -40,7 +40,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'workspace', 'job_title', 'created_at']
+    list_display = ['first_name', 'last_name', 'workspace', 'company', 'created_at']
     list_filter = ['workspace', 'gender']
     search_fields = ['first_name', 'last_name', 'email', 'phone']
 
