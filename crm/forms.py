@@ -3,6 +3,12 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User, Workspace
 
 
+INPUT_CLASSES = (
+    "w-full px-4 py-3 bg-neutral-900 border border-neutral-700 "
+    "rounded-lg text-white focus:outline-none focus:border-purple-500"
+)
+
+
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=100, required=True)
@@ -35,6 +41,41 @@ class LoginForm(forms.Form):
         'class': 'w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors',
         'placeholder': '••••••••'
     }))
+
+
+class WorkspaceBrandingForm(forms.ModelForm):
+    """Edit the workspace itself (name + sidebar branding).
+
+    The workspace name is also used as the name of its "system" Company
+    (auto-created via signals) so the workspace shows up in the Companies
+    list as its own entry.
+    """
+
+    company_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class": INPUT_CLASSES,
+            "placeholder": "Leave blank to hide the title",
+        }),
+    )
+
+    class Meta:
+        model = Workspace
+        fields = ["name", "logo", "company_name"]
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "class": INPUT_CLASSES,
+                "placeholder": "Workspace / company name",
+            }),
+            "logo": forms.FileInput(attrs={
+                "class": "block w-full text-sm text-gray-300 "
+                         "file:mr-4 file:py-2 file:px-4 file:rounded-lg "
+                         "file:border-0 file:text-sm file:font-medium "
+                         "file:bg-purple-600 file:text-white hover:file:bg-purple-700",
+                "accept": "image/jpeg,image/png,image/webp",
+            }),
+        }
 
 
 class WorkspaceSettingsForm(forms.ModelForm):

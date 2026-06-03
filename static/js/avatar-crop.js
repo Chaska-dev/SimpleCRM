@@ -161,78 +161,162 @@ function startResizeTouch(e) {
 
 function onDrag(e) {
     if (!cropState.dragMode) return;
-    
+
     const deltaX = e.clientX - cropState.dragStartX;
     const deltaY = e.clientY - cropState.dragStartY;
-    
+
     if (cropState.dragMode === 'move') {
         let newX = cropState.startFrameX + deltaX;
         let newY = cropState.startFrameY + deltaY;
-        
+
         newX = Math.max(cropState.imgLeft, Math.min(cropState.imgLeft + cropState.imgWidth - cropState.frameSize, newX));
         newY = Math.max(cropState.imgTop, Math.min(cropState.imgTop + cropState.imgHeight - cropState.frameSize, newY));
-        
+
         cropState.frameX = newX;
         cropState.frameY = newY;
     } else if (cropState.dragMode === 'resize') {
         const minSize = 60;
         const maxSize = Math.min(cropState.imgWidth, cropState.imgHeight);
-        
-        if (cropState.activeHandle === 'se') {
-            const newSize = cropState.startFrameSize + Math.max(deltaX, deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
-        } else if (cropState.activeHandle === 'nw') {
-            const newSize = cropState.startFrameSize - Math.max(deltaX, deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
-        } else if (cropState.activeHandle === 'ne') {
-            const newSize = cropState.startFrameSize + Math.max(deltaX, -deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
-        } else if (cropState.activeHandle === 'sw') {
-            const newSize = cropState.startFrameSize + Math.max(-deltaX, deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
+        const handle = cropState.activeHandle;
+
+        let newFrameX = cropState.startFrameX;
+        let newFrameY = cropState.startFrameY;
+        let newFrameSize = cropState.startFrameSize;
+
+        if (handle === 'se') {
+            newFrameSize = cropState.startFrameSize + Math.max(deltaX, deltaY);
+        } else if (handle === 'nw') {
+            const sizeDelta = Math.max(deltaX, deltaY);
+            newFrameSize = cropState.startFrameSize - sizeDelta;
+            newFrameX = cropState.startFrameX + (cropState.startFrameSize - newFrameSize);
+            newFrameY = cropState.startFrameY + (cropState.startFrameSize - newFrameSize);
+        } else if (handle === 'ne') {
+            newFrameSize = cropState.startFrameSize + Math.max(deltaX, -deltaY);
+            newFrameY = cropState.startFrameY - (newFrameSize - cropState.startFrameSize);
+        } else if (handle === 'sw') {
+            newFrameSize = cropState.startFrameSize + Math.max(-deltaX, deltaY);
+            newFrameX = cropState.startFrameX + (cropState.startFrameSize - newFrameSize);
+        } else if (handle === 'n') {
+            newFrameSize = cropState.startFrameSize - deltaY;
+            newFrameY = cropState.startFrameY + deltaY;
+        } else if (handle === 's') {
+            newFrameSize = cropState.startFrameSize + deltaY;
+        } else if (handle === 'w') {
+            newFrameSize = cropState.startFrameSize - deltaX;
+            newFrameX = cropState.startFrameX + deltaX;
+        } else if (handle === 'e') {
+            newFrameSize = cropState.startFrameSize + deltaX;
         }
+
+        newFrameSize = Math.max(minSize, Math.min(maxSize, newFrameSize));
+
+        if (handle === 'nw' || handle === 'n' || handle === 'w') {
+            const sizeDiff = cropState.startFrameSize - newFrameSize;
+            if (handle === 'nw' || handle === 'w') {
+                newFrameX = cropState.startFrameX + sizeDiff;
+            }
+            if (handle === 'nw' || handle === 'n') {
+                newFrameY = cropState.startFrameY + sizeDiff;
+            }
+        }
+
+        newFrameX = Math.max(cropState.imgLeft, newFrameX);
+        newFrameY = Math.max(cropState.imgTop, newFrameY);
+
+        if (newFrameX + newFrameSize > cropState.imgLeft + cropState.imgWidth) {
+            newFrameSize = cropState.imgLeft + cropState.imgWidth - newFrameX;
+        }
+        if (newFrameY + newFrameSize > cropState.imgTop + cropState.imgHeight) {
+            newFrameSize = cropState.imgTop + cropState.imgHeight - newFrameY;
+        }
+
+        cropState.frameX = newFrameX;
+        cropState.frameY = newFrameY;
+        cropState.frameSize = Math.max(minSize, newFrameSize);
     }
-    
+
     updateCropFramePosition();
 }
 
 function onDragTouch(e) {
     if (!cropState.dragMode || e.touches.length !== 1) return;
     e.preventDefault();
-    
+
     const deltaX = e.touches[0].clientX - cropState.dragStartX;
     const deltaY = e.touches[0].clientY - cropState.dragStartY;
-    
+
     if (cropState.dragMode === 'move') {
         let newX = cropState.startFrameX + deltaX;
         let newY = cropState.startFrameY + deltaY;
-        
+
         newX = Math.max(cropState.imgLeft, Math.min(cropState.imgLeft + cropState.imgWidth - cropState.frameSize, newX));
         newY = Math.max(cropState.imgTop, Math.min(cropState.imgTop + cropState.imgHeight - cropState.frameSize, newY));
-        
+
         cropState.frameX = newX;
         cropState.frameY = newY;
     } else if (cropState.dragMode === 'resize') {
         const minSize = 60;
         const maxSize = Math.min(cropState.imgWidth, cropState.imgHeight);
-        
-        if (cropState.activeHandle === 'se') {
-            const newSize = cropState.startFrameSize + Math.max(deltaX, deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
-        } else if (cropState.activeHandle === 'nw') {
-            const newSize = cropState.startFrameSize - Math.max(deltaX, deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
-        } else if (cropState.activeHandle === 'ne') {
-            const newSize = cropState.startFrameSize + Math.max(deltaX, -deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
-        } else if (cropState.activeHandle === 'sw') {
-            const newSize = cropState.startFrameSize + Math.max(-deltaX, deltaY);
-            cropState.frameSize = Math.max(minSize, Math.min(maxSize, newSize));
+        const handle = cropState.activeHandle;
+
+        let newFrameX = cropState.startFrameX;
+        let newFrameY = cropState.startFrameY;
+        let newFrameSize = cropState.startFrameSize;
+
+        if (handle === 'se') {
+            newFrameSize = cropState.startFrameSize + Math.max(deltaX, deltaY);
+        } else if (handle === 'nw') {
+            const sizeDelta = Math.max(deltaX, deltaY);
+            newFrameSize = cropState.startFrameSize - sizeDelta;
+            newFrameX = cropState.startFrameX + (cropState.startFrameSize - newFrameSize);
+            newFrameY = cropState.startFrameY + (cropState.startFrameSize - newFrameSize);
+        } else if (handle === 'ne') {
+            newFrameSize = cropState.startFrameSize + Math.max(deltaX, -deltaY);
+            newFrameY = cropState.startFrameY - (newFrameSize - cropState.startFrameSize);
+        } else if (handle === 'sw') {
+            newFrameSize = cropState.startFrameSize + Math.max(-deltaX, deltaY);
+            newFrameX = cropState.startFrameX + (cropState.startFrameSize - newFrameSize);
+        } else if (handle === 'n') {
+            newFrameSize = cropState.startFrameSize - deltaY;
+            newFrameY = cropState.startFrameY + deltaY;
+        } else if (handle === 's') {
+            newFrameSize = cropState.startFrameSize + deltaY;
+        } else if (handle === 'w') {
+            newFrameSize = cropState.startFrameSize - deltaX;
+            newFrameX = cropState.startFrameX + deltaX;
+        } else if (handle === 'e') {
+            newFrameSize = cropState.startFrameSize + deltaX;
         }
+
+        newFrameSize = Math.max(minSize, Math.min(maxSize, newFrameSize));
+
+        if (handle === 'nw' || handle === 'n' || handle === 'w') {
+            const sizeDiff = cropState.startFrameSize - newFrameSize;
+            if (handle === 'nw' || handle === 'w') {
+                newFrameX = cropState.startFrameX + sizeDiff;
+            }
+            if (handle === 'nw' || handle === 'n') {
+                newFrameY = cropState.startFrameY + sizeDiff;
+            }
+        }
+
+        newFrameX = Math.max(cropState.imgLeft, newFrameX);
+        newFrameY = Math.max(cropState.imgTop, newFrameY);
+
+        if (newFrameX + newFrameSize > cropState.imgLeft + cropState.imgWidth) {
+            newFrameSize = cropState.imgLeft + cropState.imgWidth - newFrameX;
+        }
+        if (newFrameY + newFrameSize > cropState.imgTop + cropState.imgHeight) {
+            newFrameSize = cropState.imgTop + cropState.imgHeight - newFrameY;
+        }
+
+        cropState.frameX = newFrameX;
+        cropState.frameY = newFrameY;
+        cropState.frameSize = Math.max(minSize, newFrameSize);
     }
-    
+
     updateCropFramePosition();
-    
+
     cropState.dragStartX = e.touches[0].clientX;
     cropState.dragStartY = e.touches[0].clientY;
 }

@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# User-uploaded media (logos, avatars) — never commit user data
+media/
+!media/.gitkeep
+
 # C extensions
 *.so
 

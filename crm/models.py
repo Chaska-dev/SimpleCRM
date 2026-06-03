@@ -104,6 +104,11 @@ class Company(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    is_workspace = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True for the company that mirrors this workspace. Cannot be deleted.",
+    )
 
     class Meta:
         ordering = ['-created_at']
@@ -187,11 +192,13 @@ class Contact(models.Model):
         verbose_name_plural = 'Contacts'
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}".strip()
+        return self.full_name or self.first_name
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.middle_name} {self.last_name}".strip()
+        return " ".join(
+            part for part in (self.first_name, self.middle_name, self.last_name) if part
+        ).strip()
 
     def soft_delete(self):
         self.is_deleted = True

@@ -1,21 +1,30 @@
+# Optional Postgres profile. Activate with: docker compose --profile postgres up
 services:
   web:
     build: .
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
-      DEBUG: "False"
+      - DEBUG=False
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - DATABASE_URL=
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY must be set}
+    volumes:
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    depends_on: []
 
   db:
     image: postgres:16
+    profiles: ["postgres"]
     environment:
       POSTGRES_DB: crm
       POSTGRES_USER: crm
-      POSTGRES_PASSWORD: crm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-crm}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  static_files:
+  media_files:
   postgres_data:

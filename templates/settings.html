@@ -22,10 +22,80 @@
             {% endif %}
 
             <div class="space-y-6">
+                <!-- Workspace Branding Section -->
+                <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-2">Workspace Branding</h3>
+                    <p class="text-sm text-gray-400 mb-6">Customize the logo and title shown in the sidebar.</p>
+
+                    <div class="flex items-center gap-6 mb-6">
+                        <div class="w-16 h-16 rounded-xl bg-purple-600 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {% if workspace.logo %}
+                            <img src="{{ workspace.logo.url }}" class="w-full h-full object-cover" alt="Workspace logo">
+                            {% else %}
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p class="text-white font-medium">{{ workspace.company_name|default:workspace.name|default:"Your workspace" }}</p>
+                            <p class="text-gray-400 text-sm">This is what users see in the sidebar.</p>
+                        </div>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" class="space-y-5">
+                        {% csrf_token %}
+                        <input type="hidden" name="_action" value="branding">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" for="{{ branding_form.name.id_for_label }}">Workspace / Company Name</label>
+                            {{ branding_form.name }}
+                            <p class="text-gray-500 text-xs mt-1">This is the unique name of your workspace and the name of the system company that represents it.</p>
+                            {% if branding_form.name.errors %}
+                                <p class="mt-1 text-sm text-red-400">{{ branding_form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" for="{{ branding_form.logo.id_for_label }}">Logo</label>
+                            {{ branding_form.logo }}
+                            <p class="text-gray-500 text-xs mt-1">JPG, PNG or WebP. Square works best.</p>
+                            {% if branding_form.logo.errors %}
+                                <p class="mt-1 text-sm text-red-400">{{ branding_form.logo.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" for="{{ branding_form.company_name.id_for_label }}">Sidebar Title</label>
+                            {{ branding_form.company_name }}
+                            <p class="text-gray-500 text-xs mt-1">Leave blank to show only the logo. Falls back to the workspace name.</p>
+                            {% if branding_form.company_name.errors %}
+                                <p class="mt-1 text-sm text-red-400">{{ branding_form.company_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex items-center gap-3 pt-2">
+                            <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                Save Branding
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if workspace.logo %}
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="_action" value="remove_logo">
+                        <button type="submit" class="text-sm text-red-400 hover:text-red-300 transition-colors">
+                            Remove logo
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+
                 <!-- Profile Picture Section -->
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
                     <h3 class="text-lg font-semibold text-white mb-6">Profile Picture</h3>
-                    
+
                     <div class="flex items-center gap-6 mb-6">
                         <div class="relative">
                             {% if user.avatar %}

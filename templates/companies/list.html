@@ -87,28 +87,28 @@
 
             <div class="bg-neutral-800 rounded-xl border border-neutral-700 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full resizable-table" style="table-layout: fixed;">
+                    <table class="w-full">
                         <thead class="bg-neutral-900">
                             <tr class="border-b border-neutral-700">
                                 <th class="py-3 px-2 w-10">
                                     <input type="checkbox" id="selectAllCheckbox" class="w-4 h-4 rounded border-gray-600 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800 cursor-pointer">
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="name" style="width: 200px; min-width: 100px; max-width: 400px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="name">
                                     Name
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="industry" style="width: 120px; min-width: 80px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="industry">
                                     Industry
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="website" style="width: 150px; min-width: 100px; max-width: 300px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="website">
                                     Website
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="phone" style="width: 120px; min-width: 100px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="phone">
                                     Phone
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="email" style="width: 150px; min-width: 100px; max-width: 250px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="email">
                                     Email
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize hidden" data-col="country" style="width: 150px; min-width: 100px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider hidden" data-col="country">
                                     Country
                                 </th>
                                 <th class="py-3 px-2 w-20">Actions</th>
@@ -118,7 +118,11 @@
                             {% for company in companies %}
                             <tr class="hover:bg-neutral-700/50 company-row" data-company-uuid="{{ company.uuid }}">
                                 <td class="py-3 px-2">
+                                    {% if company.is_workspace %}
+                                    <span class="w-4 h-4 inline-block" title="Workspace company — cannot be deleted"></span>
+                                    {% else %}
                                     <input type="checkbox" class="company-checkbox w-4 h-4 rounded border-gray-600 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800 cursor-pointer" value="{{ company.uuid }}">
+                                    {% endif %}
                                 </td>
                                 <td class="py-3 px-3">
                                     <div class="flex items-center gap-3">
@@ -129,7 +133,14 @@
                                             {{ company.name.0|default:'?'|upper }}
                                         </div>
                                         {% endif %}
-                                        <span class="text-sm text-white truncate">{{ company.name }}</span>
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-sm text-white truncate">{{ company.name }}</span>
+                                            {% if company.is_workspace %}
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-purple-600/20 text-purple-300 border border-purple-600/30" title="This company represents your workspace. It cannot be deleted.">
+                                                Workspace
+                                            </span>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="py-3 px-3 text-sm text-gray-400 whitespace-nowrap truncate" data-col="industry">{{ company.industry|default:'-' }}</td>
@@ -144,11 +155,13 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
                                         </a>
+                                        {% if not company.is_workspace %}
                                         <button onclick="showDeleteModal('{{ company.uuid }}', '{{ company.name }}')" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-600/10 rounded-lg transition-colors" title="Delete">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
                                         </button>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -156,34 +169,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-                                        {% endif %}
-                                        <span class="text-sm text-white truncate">{{ company.name }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-3 py-3 text-sm text-gray-400 whitespace-nowrap truncate" data-col="industry">{{ company.industry|default:'-' }}</td>
-                                <td class="px-3 py-3 text-sm text-gray-400 truncate" data-col="website">{{ company.website|default:'-' }}</td>
-                                <td class="px-3 py-3 text-sm text-gray-400 whitespace-nowrap" data-col="phone">{{ company.phone|default:'-' }}</td>
-                                <td class="px-3 py-3 text-sm text-gray-400 whitespace-nowrap" data-col="email">{{ company.email|default:'-' }}</td>
-                                <td class="px-3 py-3 text-sm text-gray-400 whitespace-nowrap hidden" data-col="country">-</td>
-                            <td class="px-3 py-3">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="{% url 'company-edit' company.uuid %}" class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-600/10 rounded-lg transition-colors" title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </a>
-                                    <button onclick="showDeleteModal('{{ company.uuid }}', '{{ company.name }}')" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-600/10 rounded-lg transition-colors" title="Delete">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
             </div>
             {% else %}
             <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-12 text-center">
@@ -268,6 +253,11 @@
     {% csrf_token %}
 </form>
 
+<form id="bulkDeleteForm" method="POST" action="{% url 'company-bulk-delete' %}" style="display: none;">
+    {% csrf_token %}
+    <div id="bulkDeleteUuids"></div>
+</form>
+
 <script>
 let selectedUUIDs = [];
 
@@ -288,11 +278,17 @@ function closeDeleteModal() {
 function showBulkDeleteModal() {
     document.getElementById('bulkDeleteModalText').textContent = 'Are you sure you want to delete ' + selectedUUIDs.length + ' selected company(s)? This action cannot be undone.';
     document.getElementById('confirmBulkDeleteBtn').onclick = function() {
-        let action = '/companies/bulk-delete/?';
+        const form = document.getElementById('bulkDeleteForm');
+        const container = document.getElementById('bulkDeleteUuids');
+        container.innerHTML = '';
         selectedUUIDs.forEach(function(uuid) {
-            action += 'uuids=' + encodeURIComponent(uuid) + '&';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'uuids';
+            input.value = uuid;
+            container.appendChild(input);
         });
-        window.location.href = action.slice(0, -1);
+        form.submit();
     };
     document.getElementById('bulkDeleteModal').classList.remove('hidden');
 }
@@ -371,105 +367,5 @@ document.getElementById('deleteSelectedBtn').addEventListener('click', function(
         showBulkDeleteModal();
     }
 });
-
-// Column Resize Functionality
-let companyIsResizing = false;
-let companyCurrentTh = null;
-let companyStartX = 0;
-let companyStartWidth = 0;
-let companyMinWidth = 80;
-let companyMaxWidth = 500;
-
-document.querySelectorAll('th.cursor-col-resize').forEach(function(th) {
-    th.addEventListener('mousedown', function(e) {
-        const rect = th.getBoundingClientRect();
-        const isNearRightEdge = (e.clientX - rect.left) > (rect.width - 8);
-
-        if (isNearRightEdge) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            companyIsResizing = true;
-            companyCurrentTh = th;
-            companyStartX = e.clientX;
-            companyStartWidth = rect.width;
-
-            const style = window.getComputedStyle(th);
-            companyMinWidth = parseInt(style.minWidth) || 80;
-            companyMaxWidth = parseInt(style.maxWidth) || 500;
-
-            th.classList.add('resizing');
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-        }
-    });
-});
-
-document.addEventListener('mousemove', function(e) {
-    if (!companyIsResizing || !companyCurrentTh) return;
-
-    const col = companyCurrentTh.dataset.col;
-    const diff = e.clientX - companyStartX;
-    let newWidth = companyStartWidth + diff;
-
-    newWidth = Math.max(companyMinWidth, Math.min(companyMaxWidth, newWidth));
-
-    companyCurrentTh.style.width = newWidth + 'px';
-
-    document.querySelectorAll('#companiesTableBody td[data-col="' + col + '"]').forEach(function(td) {
-        td.style.width = newWidth + 'px';
-    });
-});
-
-document.addEventListener('mouseup', function() {
-    if (companyIsResizing && companyCurrentTh) {
-        companyCurrentTh.classList.remove('resizing');
-        companyIsResizing = false;
-        companyCurrentTh = null;
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-    }
-});
-});
-
-document.addEventListener('mousemove', function(e) {
-    if (!companyIsResizing || !companyCurrentTh) return;
-
-    const col = companyCurrentTh.dataset.col;
-    const diff = e.pageX - companyStartX;
-    const newWidth = Math.max(50, companyStartWidth + diff);
-
-    companyCurrentTh.style.width = newWidth + 'px';
-
-    document.querySelectorAll('tbody td[data-col="' + col + '"]').forEach(function(td) {
-        td.style.width = newWidth + 'px';
-    });
-});
-
-document.addEventListener('mouseup', function() {
-    if (companyIsResizing) {
-        companyIsResizing = false;
-        companyCurrentTh = null;
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-    }
-});
 </script>
-
-<style>
-th.cursor-col-resize {
-    cursor: col-resize;
-    position: relative;
-    user-select: none;
-}
-
-th.cursor-col-resize:hover {
-    background: rgba(168, 85, 247, 0.1);
-}
-
-th.cursor-col-resize:active,
-th.cursor-col-resize.resizing {
-    background: rgba(168, 85, 247, 0.2);
-}
-</style>
 {% endblock %}

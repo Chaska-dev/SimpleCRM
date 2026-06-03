@@ -91,31 +91,31 @@
 
             <div class="bg-neutral-800 rounded-xl border border-neutral-700 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full resizable-table" style="table-layout: fixed;">
+                    <table class="w-full">
                         <thead class="bg-neutral-900">
                             <tr class="border-b border-neutral-700">
                                 <th class="py-3 px-2 w-10">
                                     <input type="checkbox" id="selectAllCheckbox" class="w-4 h-4 rounded border-gray-600 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800 cursor-pointer">
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="name" style="width: 200px; min-width: 100px; max-width: 400px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="name">
                                     Name
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="personal_email" style="width: 150px; min-width: 100px; max-width: 300px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="personal_email">
                                     Personal Email
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="work_email" style="width: 150px; min-width: 100px; max-width: 300px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="work_email">
                                     Work Email
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="personal_phone" style="width: 120px; min-width: 100px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="personal_phone">
                                     Personal Phone
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="work_phone" style="width: 120px; min-width: 100px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="work_phone">
                                     Work Phone
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize" data-col="company" style="width: 120px; min-width: 80px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" data-col="company">
                                     Company
                                 </th>
-                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-col-resize hidden" data-col="country" style="width: 150px; min-width: 100px; max-width: 200px;">
+                                <th class="py-3 px-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider hidden" data-col="country">
                                     Country
                                 </th>
                                 <th class="py-3 px-2 w-20">Actions</th>
@@ -248,6 +248,11 @@
     {% csrf_token %}
 </form>
 
+<form id="bulkDeleteForm" method="POST" action="{% url 'contact-bulk-delete' %}" style="display: none;">
+    {% csrf_token %}
+    <div id="bulkDeleteUuids"></div>
+</form>
+
 <script>
 let selectedUUIDs = [];
 
@@ -268,11 +273,17 @@ function closeDeleteModal() {
 function showBulkDeleteModal() {
     document.getElementById('bulkDeleteModalText').textContent = 'Are you sure you want to delete ' + selectedUUIDs.length + ' selected contact(s)? This action cannot be undone.';
     document.getElementById('confirmBulkDeleteBtn').onclick = function() {
-        let action = '/contacts/bulk-delete/?';
+        const form = document.getElementById('bulkDeleteForm');
+        const container = document.getElementById('bulkDeleteUuids');
+        container.innerHTML = '';
         selectedUUIDs.forEach(function(uuid) {
-            action += 'uuids=' + encodeURIComponent(uuid) + '&';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'uuids';
+            input.value = uuid;
+            container.appendChild(input);
         });
-        window.location.href = action.slice(0, -1);
+        form.submit();
     };
     document.getElementById('bulkDeleteModal').classList.remove('hidden');
 }
@@ -352,65 +363,6 @@ document.getElementById('deleteSelectedBtn').addEventListener('click', function(
     }
 });
 
-// Column Resize Functionality
-let isResizing = false;
-let currentTh = null;
-let startX = 0;
-let startWidth = 0;
-let currentMinWidth = 80;
-let currentMaxWidth = 500;
-
-document.querySelectorAll('th.cursor-col-resize').forEach(function(th) {
-    th.addEventListener('mousedown', function(e) {
-        const rect = th.getBoundingClientRect();
-        const isNearRightEdge = (e.clientX - rect.left) > (rect.width - 8);
-
-        if (isNearRightEdge) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            isResizing = true;
-            currentTh = th;
-            startX = e.clientX;
-            startWidth = rect.width;
-
-            const style = window.getComputedStyle(th);
-            currentMinWidth = parseInt(style.minWidth) || 80;
-            currentMaxWidth = parseInt(style.maxWidth) || 500;
-
-            th.classList.add('resizing');
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-        }
-    });
-});
-
-document.addEventListener('mousemove', function(e) {
-    if (!isResizing || !currentTh) return;
-
-    const col = currentTh.dataset.col;
-    const diff = e.clientX - startX;
-    let newWidth = startWidth + diff;
-
-    newWidth = Math.max(currentMinWidth, Math.min(currentMaxWidth, newWidth));
-
-    currentTh.style.width = newWidth + 'px';
-
-    document.querySelectorAll('#contactsTableBody td[data-col="' + col + '"]').forEach(function(td) {
-        td.style.width = newWidth + 'px';
-    });
-});
-
-document.addEventListener('mouseup', function() {
-    if (isResizing && currentTh) {
-        currentTh.classList.remove('resizing');
-        isResizing = false;
-        currentTh = null;
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-    }
-});
-
 // Column visibility toggle
 document.querySelectorAll('.column-checkbox').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
@@ -427,21 +379,4 @@ document.querySelectorAll('.column-checkbox').forEach(function(checkbox) {
     });
 });
 </script>
-
-<style>
-th.cursor-col-resize {
-    cursor: col-resize;
-    position: relative;
-    user-select: none;
-}
-
-th.cursor-col-resize:hover {
-    background: rgba(168, 85, 247, 0.1);
-}
-
-th.cursor-col-resize:active,
-th.cursor-col-resize.resizing {
-    background: rgba(168, 85, 247, 0.2);
-}
-</style>
 {% endblock %}

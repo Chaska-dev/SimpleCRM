@@ -2,8 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Instalar node para tailwind build
-RUN apt-get update && apt-get install -y nodejs npm
+# Build deps for Pillow + node for tailwind
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nodejs \
+    npm \
+    libjpeg-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Python deps
 COPY requirements.txt .
@@ -13,15 +18,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY package*.json ./
 RUN npm install
 
-# Copiar proyecto
+# Copy source
 COPY . .
 
 # Build Tailwind
 RUN python manage.py tailwind build
 
-# Collect static
+# Collect static (DEBUG is forced False during build via env)
+ENV DEBUG=False
 RUN python manage.py collectstatic --noinput
+
+# Run as non-root
+RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
+USER app
 
 EXPOSE 8000
 
-CMD ["gunicorn", "crm.wsgi:application", "--bind", "0.0.0.0:3010"]
+CMD ["gunicorn", "allcrm.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--access-logfile", "-"]
