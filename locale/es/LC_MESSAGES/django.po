@@ -1,0 +1,550 @@
+# Spanish translations for CRM.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CRM\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-07 12:00+0000\n"
+"PO-Revision-Date: 2026-06-07 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/auth/login.html
+msgid "Login"
+msgstr "Iniciar Sesión"
+
+msgid "Welcome Back"
+msgstr "Bienvenido de Nuevo"
+
+msgid "Sign in to continue to your workspace"
+msgstr "Inicia sesión para continuar a tu espacio de trabajo"
+
+msgid "Username"
+msgstr "Usuario"
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Remember me"
+msgstr "Recordarme"
+
+msgid "Forgot password?"
+msgstr "¿Olvidaste tu contraseña?"
+
+msgid "Sign In"
+msgstr "Ingresar"
+
+msgid "Don't have an account?"
+msgstr "¿No tienes una cuenta?"
+
+msgid "Create one"
+msgstr "Crea una"
+
+#: templates/dashboard.html
+msgid "Dashboard"
+msgstr "Panel"
+
+msgid "Search anything..."
+msgstr "Buscar cualquier cosa..."
+
+msgid "Contacts"
+msgstr "Contactos"
+
+msgid "Companies"
+msgstr "Empresas"
+
+msgid "Quick Add"
+msgstr "Agregar Rápido"
+
+msgid "No Phone"
+msgstr "Sin Teléfono"
+
+msgid "No Email"
+msgstr "Sin Correo"
+
+msgid "No contacts yet"
+msgstr "Aún no hay contactos"
+
+msgid "Create your first contact to get started."
+msgstr "Crea tu primer contacto para comenzar."
+
+msgid "Add Contact"
+msgstr "Agregar Contacto"
+
+msgid "Quick Create Contact"
+msgstr "Crear Contacto Rápido"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Create Contact"
+msgstr "Crear Contacto"
+
+msgid "Crop Your Photo"
+msgstr "Recorta Tu Foto"
+
+msgid "Drag to move, corners to resize proportionally"
+msgstr "Arrastra para mover, esquinas para redimensionar proporcionalmente"
+
+msgid "Save Photo"
+msgstr "Guardar Foto"
+
+#: templates/dashboard.html (sort options)
+msgid "Newest first"
+msgstr "Más reciente primero"
+
+msgid "Oldest first"
+msgstr "Más antiguo primero"
+
+msgid "Name A → Z"
+msgstr "Nombre A → Z"
+
+msgid "Name Z → A"
+msgstr "Nombre Z → A"
+
+#: templates/includes/sidebar.html
+msgid "Birthdays"
+msgstr "Cumpleaños"
+
+msgid "Import / Export"
+msgstr "Importar / Exportar"
+
+msgid "Settings"
+msgstr "Configuración"
+
+#: templates/settings.html
+msgid "Workspace Branding"
+msgstr "Marca del Espacio de Trabajo"
+
+msgid "Customize the logo and title shown in the sidebar."
+msgstr "Personaliza el logo y título mostrado en la barra lateral."
+
+msgid "Workspace logo"
+msgstr "Logo del espacio de trabajo"
+
+msgid "Your workspace"
+msgstr "Tu espacio de trabajo"
+
+msgid "Current preview"
+msgstr "Vista previa actual"
+
+msgid "Workspace Name"
+msgstr "Nombre del Espacio de Trabajo"
+
+msgid "Sidebar Title"
+msgstr "Título de la Barra Lateral"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "JPG, PNG or WebP. Square works best. Leave blank to keep current."
+msgstr "JPG, PNG o WebP. Cuadrado funciona mejor. Deja en blanco para mantener el actual."
+
+msgid "Save Branding"
+msgstr "Guardar Marca"
+
+msgid "Remove logo"
+msgstr "Eliminar logo"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Choose the language used across the interface."
+msgstr "Elige el idioma usado en toda la interfaz."
+
+msgid "Save Language"
+msgstr "Guardar Idioma"
+
+msgid "Profile"
+msgstr "Perfil"
+
+msgid "Change"
+msgstr "Cambiar"
+
+msgid "Remove"
+msgstr "Eliminar"
+
+msgid "Email"
+msgstr "Correo"
+
+msgid "First Name"
+msgstr "Nombre"
+
+msgid "Last Name"
+msgstr "Apellido"
+
+msgid "Change Password"
+msgstr "Cambiar Contraseña"
+
+msgid "Current"
+msgstr "Actual"
+
+msgid "New"
+msgstr "Nueva"
+
+msgid "Confirm"
+msgstr "Confirmar"
+
+msgid "Update Password"
+msgstr "Actualizar Contraseña"
+
+#: templates/contacts/list.html
+msgid "Newest first"
+msgstr "Más reciente primero"
+
+msgid "Oldest first"
+msgstr "Más antiguo primero"
+
+msgid "Name A → Z"
+msgstr "Nombre A → Z"
+
+msgid "Name Z → A"
+msgstr "Nombre Z → A"
+
+#: templates/companies/list.html
+msgid "Name A → Z"
+msgstr "Nombre A → Z"
+
+msgid "Name Z → A"
+msgstr "Nombre Z → A"
+
+#: templates/includes/cropper-modal.html
+msgid "Crop Your Photo"
+msgstr "Recorta Tu Foto"
+
+msgid "Drag to move, corners to resize proportionally"
+msgstr "Arrastra para mover, esquinas para redimensionar proporcionalmente"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Save Photo"
+msgstr "Guardar Foto"
+
+#: templates/contacts/create.html, contacts/edit.html
+msgid "Create Contact"
+msgstr "Crear Contacto"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: templates/companies/create.html, companies/edit.html
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: templates/navbar.html
+msgid "Good morning,"
+msgstr "Buenos días,"
+
+msgid "Good afternoon,"
+msgstr "Buenas tardes,"
+
+msgid "Good evening,"
+msgstr "Buenas noches,"
+
+msgid "User"
+msgstr "Usuario"
+
+#: templates/import_export.html
+msgid "Import / Export"
+msgstr "Importar / Exportar"
+
+msgid "Import / Export Contacts"
+msgstr "Importar / Exportar Contactos"
+
+msgid "result"
+msgstr "resultado"
+
+msgid "contacts created"
+msgstr "contactos creados"
+
+msgid "skipped"
+msgstr "omitidos"
+
+msgid "from"
+msgstr "de"
+
+msgid "rows read"
+msgstr "filas leídas"
+
+msgid "Show"
+msgstr "Mostrar"
+
+msgid "issue"
+msgstr "problema"
+
+msgid "Import Contacts"
+msgstr "Importar Contactos"
+
+msgid "Upload a file to import contacts"
+msgstr "Sube un archivo para importar contactos"
+
+msgid "File format"
+msgstr "Formato de archivo"
+
+msgid "File"
+msgstr "Archivo"
+
+msgid "CSV, XLSX, VCF or JSON. Column order doesn't matter — matching is done by header name."
+msgstr "CSV, XLSX, VCF o JSON. El orden de columnas no importa — la coincidencia se hace por nombre de encabezado."
+
+msgid "Need a starting point? Download a template:"
+msgstr "¿Necesitas un punto de partida? Descarga una plantilla:"
+
+msgid "CSV template"
+msgstr "Plantilla CSV"
+
+msgid "Excel template"
+msgstr "Plantilla Excel"
+
+msgid "vCard template"
+msgstr "Plantilla vCard"
+
+msgid "Export Contacts"
+msgstr "Exportar Contactos"
+
+msgid "Download all your contacts"
+msgstr "Descarga todos tus contactos"
+
+msgid "Export format"
+msgstr "Formato de exportación"
+
+msgid "This will export all"
+msgstr "Esto exportará todos"
+
+msgid "contacts from your workspace"
+msgstr "contactos de tu espacio de trabajo"
+
+msgid "Column mapping reference"
+msgstr "Referencia de mapeo de columnas"
+
+msgid "For CSV and XLSX, the importer matches columns by header name — order does not matter. Synonyms in English and Spanish are accepted."
+msgstr "Para CSV y XLSX, el importador hace coincidir las columnas por nombre de encabezado — el orden no importa. Se aceptan sinónimos en inglés y español."
+
+msgid "Field"
+msgstr "Campo"
+
+msgid "Accepted header names (EN + ES)"
+msgstr "Nombres de encabezado aceptados (EN + ES)"
+
+msgid "Notes"
+msgstr "Notas"
+
+msgid "Supported formats"
+msgstr "Formatos soportados"
+
+msgid "Comma-separated values. The safest choice — every spreadsheet app can read it."
+msgstr "Valores separados por comas. La opción más segura — todas las hojas de cálculo pueden leerlo."
+
+msgid "Microsoft Excel. The first row must contain the column headers."
+msgstr "Microsoft Excel. La primera fila debe contener los encabezados de columna."
+
+msgid "Standard contact format. Compatible with macOS Contacts, Google Contacts, Outlook, iOS and Android."
+msgstr "Formato estándar de contactos. Compatible con macOS Contacts, Google Contacts, Outlook, iOS y Android."
+
+msgid "List of contact objects. Useful for developers and migrations from other systems."
+msgstr "Lista de objetos de contacto. Útil para desarrolladores y migraciones desde otros sistemas."
+
+msgid "For"
+msgstr "Para"
+
+msgid "the standard vCard 3.0 properties are used"
+msgstr "se usan las propiedades estándar de vCard 3.0"
+
+msgid "use the same field names as in the CSV headers (camelCase is also accepted)"
+msgstr "usa los mismos nombres de campo que en los encabezados CSV (camelCase también es aceptado)"
+
+#: templates/contacts/list.html
+msgid "Visible Columns"
+msgstr "Columnas Visibles"
+
+#: Field descriptions from import_export.py
+msgid "Required. Given / first name."
+msgstr "Requerido. Nombre de pila."
+
+msgid "Optional. Middle name."
+msgstr "Opcional. Segundo nombre."
+
+msgid "Optional. Family / last name."
+msgstr "Opcional. Apellido."
+
+msgid "Optional. Informal name."
+msgstr "Opcional. Nombre informal."
+
+msgid "Optional. MALE / FEMALE / OTHER / PREFER_NOT_TO_SAY."
+msgstr "Opcional. MASCULINO / FEMENINO / OTRO / PREFIERO_NO_DECIR."
+
+msgid "Optional. YYYY-MM-DD."
+msgstr "Opcional. AAAA-MM-DD."
+
+msgid "Optional. Personal email address."
+msgstr "Opcional. Correo personal."
+
+msgid "Optional. Work / business email address."
+msgstr "Opcional. Correo de trabajo."
+
+msgid "Optional. Mobile / cell phone."
+msgstr "Opcional. Teléfono móvil."
+
+msgid "Optional. Office phone or extension."
+msgstr "Opcional. Teléfono de oficina o extensión."
+
+msgid "Optional. Company name. Created if it does not exist."
+msgstr "Opcional. Nombre de empresa. Se crea si no existe."
+
+msgid "Optional. Personal website URL."
+msgstr "Opcional. URL de sitio web personal."
+
+msgid "Optional. Postal address (free text)."
+msgstr "Opcional. Dirección postal (texto libre)."
+
+msgid "Optional. Country name (Spanish or English)."
+msgstr "Opcional. Nombre de país (español o inglés)."
+
+msgid "Optional. State / province name."
+msgstr "Opcional. Nombre de estado / provincia."
+
+msgid "Optional. City name."
+msgstr "Opcional. Nombre de ciudad."
+
+msgid "Optional. Free-form notes."
+msgstr "Opcional. Notas de texto libre."
+
+msgid "Optional. Full LinkedIn profile URL."
+msgstr "Opcional. URL completa del perfil de LinkedIn."
+
+msgid "Optional. Full GitHub profile URL."
+msgstr "Opcional. URL completa del perfil de GitHub."
+
+msgid "Optional. Full Facebook profile URL."
+msgstr "Opcional. URL completa del perfil de Facebook."
+
+msgid "Optional. Full Instagram profile URL."
+msgstr "Opcional. URL completa del perfil de Instagram."
+
+msgid "Optional. Full Twitter / X profile URL."
+msgstr "Opcional. URL completa del perfil de Twitter / X."
+
+msgid "Optional. Full TikTok profile URL."
+msgstr "Opcional. URL completa del perfil de TikTok."
+
+msgid "Optional. Full YouTube channel URL."
+msgstr "Opcional. URL completa del canal de YouTube."
+
+msgid "Optional. Full Telegram URL or @handle."
+msgstr "Opcional. URL completa de Telegram o @usuario."
+
+msgid "Optional. Discord username."
+msgstr "Opcional. Nombre de usuario de Discord."
+
+#: templates/contacts/list.html, companies/list.html
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Personal Email"
+msgstr "Correo Personal"
+
+msgid "Work Email"
+msgstr "Correo de Trabajo"
+
+msgid "Personal Phone"
+msgstr "Teléfono Personal"
+
+msgid "Work Phone"
+msgstr "Teléfono de Trabajo"
+
+msgid "Company"
+msgstr "Empresa"
+
+msgid "Country"
+msgstr "País"
+
+msgid "Photo"
+msgstr "Foto"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Columns"
+msgstr "Columnas"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Industry"
+msgstr "Industria"
+
+msgid "Phone"
+msgstr "Teléfono"
+
+msgid "Email"
+msgstr "Correo"
+
+msgid "Visible Columns"
+msgstr "Columnas Visibles"
+
+msgid "No companies yet"
+msgstr "Aún no hay empresas"
+
+msgid "Create your first company to get started."
+msgstr "Crea tu primera empresa para comenzar."
+
+msgid "Add Company"
+msgstr "Agregar Empresa"
+
+#: templates/birthdays.html
+msgid "Birthdays"
+msgstr "Cumpleaños"
+
+msgid "Current"
+msgstr "Actual"
+
+msgid "Today"
+msgstr "Hoy"
+
+msgid "Selected day"
+msgstr "Día seleccionado"
+
+msgid "Clear"
+msgstr "Limpiar"
+
+msgid "Turns"
+msgstr "Cumple"
+
+msgid "Birthday"
+msgstr "Cumpleaños"
+
+msgid "No birthdays on this day"
+msgstr "No hay cumpleaños este día"
+
+msgid "Click a day to inspect"
+msgstr "Haz clic en un día para ver"
+
+msgid "No birthdays in"
+msgstr "No hay cumpleaños en"
+
+msgid "All upcoming"
+msgstr "Próximos"
+
+msgid "Sorted by next birthday"
+msgstr "Ordenados por próximo cumpleaños"
+
+msgid "Now"
+msgstr "Ahora"
+
+msgid "No upcoming birthdays"
+msgstr "No hay cumpleaños próximos"
+
+msgid "Add a birthday to your contacts to see them here."
+msgstr "Agrega un cumpleaños a tus contactos para verlos aquí."
+
+msgid "New Company"
+msgstr "Nueva Empresa"
+
+msgid "New Contact"
+msgstr "Nuevo Contacto"

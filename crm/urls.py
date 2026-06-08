@@ -7,11 +7,14 @@ urlpatterns = [
     path("register/", views.register, name="register"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
+    path("set-language/", views.set_language, name="set_language"),
 
     # Dashboard / settings
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("birthdays/", views.birthdays, name="birthdays"),
     path("settings/", views.settings, name="settings"),
     path("import-export/", views.import_export, name="import-export"),
+    path("import-export/template/<str:fmt>/", views.import_export_template, name="import-export-template"),
     path("buttons/", views.buttons, name="buttons"),
 
     # Contacts

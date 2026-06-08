@@ -101,6 +101,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -121,6 +122,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "crm.context_processors.i18n_flags",
             ],
         },
     },
@@ -190,10 +192,22 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("en", "English"),
+    ("es", "Español"),
+]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+
+# Make the active language stick in the session so the LocaleMiddleware
+# (which only reads the Accept-Language header on first request) honors
+# the user's explicit choice from the settings page.
+LANGUAGE_COOKIE_NAME = "django_language"
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
+LANGUAGE_COOKIE_PATH = "/"
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [STATIC_DIR]

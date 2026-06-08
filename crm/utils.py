@@ -162,6 +162,8 @@ def get_or_create_locale(
             return obj
         defaults = {name_field: clean}
 
+    if parent is not None:
+        defaults[parent_field] = parent
     if extra_defaults:
         defaults.update(extra_defaults)
     return model.objects.create(**defaults)

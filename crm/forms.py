@@ -78,6 +78,19 @@ class WorkspaceBrandingForm(forms.ModelForm):
         }
 
 
+class LanguagePreferenceForm(forms.Form):
+    """Lightweight form that only exposes the language picker on the
+    settings page (the rest of the form is the existing branding one)."""
+    LANGUAGE_CHOICES = [
+        ("en", "English"),
+        ("es", "Español"),
+    ]
+    language = forms.ChoiceField(
+        choices=LANGUAGE_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "sr-only peer"}),
+    )
+
+
 class WorkspaceSettingsForm(forms.ModelForm):
     class Meta:
         model = Workspace

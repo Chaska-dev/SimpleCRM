@@ -13,6 +13,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import JsonResponse
+from django.conf import settings
+from django.shortcuts import redirect
+from django.utils import translation
+from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST, require_http_methods
 
@@ -24,6 +28,7 @@ from .utils import (
     parse_uuids,
     search_location,
 )
+from . import import_export as ie
 
 
 # ---------------------------------------------------------------------------
@@ -32,6 +37,15 @@ from .utils import (
 def register(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
+
+
+# ---------------------------------------------------------------------------
+# Error handlers
+# ---------------------------------------------------------------------------
+def custom_404(request, exception=None):
+    """Custom 404 handler. Renders templates/404.html with status 404."""
+    response = render(request, "404.html", status=404)
+    return response
 
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
@@ -78,23 +92,222 @@ def logout_view(request):
 
 
 # ---------------------------------------------------------------------------
+# Language switcher
+# ---------------------------------------------------------------------------
+@require_POST
+def set_language(request):
+    """Persist the user's language choice on their profile and the session.
+
+    The LocaleMiddleware already activates the language for the current
+    request; we just need to remember it across requests by writing to
+    the User record (so it survives session expiry) and to the session
+    (so it wins over the browser's Accept-Language header).
+    """
+    from django.conf import settings as dj_settings
+    from django.utils.translation import gettext_lazy as _
+
+    next_url = request.POST.get("next") or request.META.get("HTTP_REFERER") or "/dashboard/"
+    lang = request.POST.get("language", "").strip()
+    supported = {code for code, _ in dj_settings.LANGUAGES}
+    if lang not in supported:
+        messages.error(request, _("Invalid language."))
+        return redirect(next_url)
+
+    translation.activate(lang)
+    request.session["django_language"] = lang
+    response = redirect(next_url)
+    # Set the language cookie so the LocaleMiddleware picks it up next request
+    response.set_cookie(
+        dj_settings.LANGUAGE_COOKIE_NAME,
+        lang,
+        max_age=dj_settings.LANGUAGE_COOKIE_AGE,
+        path=dj_settings.LANGUAGE_COOKIE_PATH,
+        samesite="Lax",
+    )
+
+    if request.user.is_authenticated:
+        request.user.language = lang
+        request.user.save(update_fields=["language", "updated_at"])
+        # Make the just-saved language effective for this request too
+        request.user.refresh_from_db()
+
+    return response
+
+
+# ---------------------------------------------------------------------------
 # Dashboard / settings
 # ---------------------------------------------------------------------------
 @login_required
+def _get_sort_param(request, default, allowed):
+    """Get sort parameter from request, validated against allowed options."""
+    sort = request.GET.get("sort", default)
+    return sort if sort in allowed else default
+
+
 def dashboard(request):
     workspace = request.user.workspace
+    sort = _get_sort_param(request, "-created_at", ["first_name", "-first_name", "-created_at", "created_at"])
     contacts = (
         Contact.objects.filter(workspace=workspace, is_deleted=False)
         .select_related()
         .prefetch_related("company_relationships__company")
+        .order_by(sort)
     )
     companies = Company.objects.filter(workspace=workspace, is_deleted=False)
+
+    hour = translation.gettext_noop("Good morning,")
+    greeting = f"{translation.gettext(hour)} {request.user.first_name or translation.gettext('User')}"
+
     context = {
         "contacts": contacts,
         "contacts_count": contacts.count(),
         "companies_count": companies.count(),
+        "current_sort": sort,
+        "navbar_title": greeting,
     }
     return render(request, "dashboard.html", context)
+
+
+@login_required
+def birthdays(request):
+    import calendar as cal_mod
+    from datetime import date
+
+    workspace = request.user.workspace
+    today = date.today()
+
+    # Optional month nav via ?month=YYYY-MM
+    try:
+        month_str = request.GET.get("month", "")
+        year, month = (int(p) for p in month_str.split("-")) if month_str else (today.year, today.month)
+        if not (1 <= month <= 12) or year < 1900 or year > 2200:
+            year, month = today.year, today.month
+    except (ValueError, AttributeError):
+        year, month = today.year, today.month
+
+    # Optional day selection via ?day=YYYY-MM-DD
+    selected_day = None
+    day_str = request.GET.get("day", "")
+    if day_str:
+        try:
+            selected_day = date.fromisoformat(day_str)
+        except ValueError:
+            selected_day = None
+    # If the selected day is not in the displayed month, drop it
+    if selected_day and (selected_day.month != month or selected_day.year != year):
+        selected_day = None
+
+    # Previous/next month strings for nav
+    if month == 1:
+        prev_year, prev_month = year - 1, 12
+    else:
+        prev_year, prev_month = year, month - 1
+    if month == 12:
+        next_year, next_month = year + 1, 1
+    else:
+        next_year, next_month = year, month + 1
+
+    is_current_month = (year == today.year and month == today.month)
+
+    birthday_contacts = list(
+        Contact.objects.filter(
+            workspace=workspace,
+            is_deleted=False,
+            birthday__isnull=False,
+        ).only("uuid", "first_name", "last_name", "avatar", "birthday")
+    )
+
+    def _next_bday(birthday):
+        try:
+            nxt = birthday.replace(year=today.year)
+        except ValueError:
+            nxt = birthday.replace(year=today.year, day=1, month=3)
+        if nxt < today:
+            try:
+                nxt = birthday.replace(year=today.year + 1)
+            except ValueError:
+                nxt = birthday.replace(year=today.year + 1, day=1, month=3)
+        return nxt
+
+    enriched = []
+    for c in birthday_contacts:
+        nxt = _next_bday(c.birthday)
+        turning = None
+        if c.birthday.year > 1900:
+            turning = nxt.year - c.birthday.year
+        enriched.append({
+            "contact": c,
+            "next_date": nxt,
+            "days_away": (nxt - today).days,
+            "turning": turning,
+        })
+    enriched.sort(key=lambda x: x["days_away"])
+
+    # Birthdays in the displayed month
+    month_birthdays = [
+        e for e in enriched
+        if e["next_date"].month == month and e["next_date"].year == year
+    ]
+
+    # Birthdays on the selected day
+    selected_day_birthdays = []
+    if selected_day:
+        selected_day_birthdays = [
+            e for e in enriched
+            if e["next_date"].month == selected_day.month
+            and e["next_date"].day == selected_day.day
+            and e["next_date"].year >= selected_day.year
+        ][:6]
+
+    cal = cal_mod.Calendar(firstweekday=0)
+    calendar_weeks = []
+    for week in cal.monthdayscalendar(year, month):
+        week_data = []
+        for day in week:
+            if day == 0:
+                week_data.append({
+                    "day": "", "is_today": False, "is_past": False,
+                    "is_selected": False, "birthdays": [],
+                })
+                continue
+            day_birthdays = [
+                {"name": c.full_name, "uuid": str(c.uuid)}
+                for c in birthday_contacts
+                if c.birthday.month == month and c.birthday.day == day
+            ]
+            day_date = date(year, month, day)
+            week_data.append({
+                "day": day,
+                "is_today": day_date == today,
+                "is_past": day_date < today,
+                "is_selected": bool(selected_day and selected_day == day_date),
+                "birthdays": day_birthdays,
+                "date": day_date,
+            })
+        calendar_weeks.append(week_data)
+
+    month_names = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+    ]
+
+    context = {
+        "calendar_month_name": month_names[month - 1],
+        "calendar_year": year,
+        "calendar_month_num": month,
+        "calendar_weeks": calendar_weeks,
+        "weekday_names": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        "prev_month_link": f"?month={prev_year:04d}-{prev_month:02d}",
+        "next_month_link": f"?month={next_year:04d}-{next_month:02d}",
+        "current_month_link": f"?month={year:04d}-{month:02d}",
+        "is_current_month": is_current_month,
+        "today": today,
+        "selected_day": selected_day,
+        "selected_day_birthdays": selected_day_birthdays,
+        "month_birthdays": month_birthdays,
+        "all_upcoming": [e for e in enriched if 0 <= e["days_away"] <= 365],
+    }
+    return render(request, "birthdays.html", context)
 
 
 @login_required
@@ -159,12 +372,15 @@ def settings(request):
         form = PasswordChangeForm(user)
 
     branding_form = WorkspaceBrandingForm(instance=workspace)
+    from .forms import LanguagePreferenceForm
+    language_form = LanguagePreferenceForm(initial={"language": user.language or "en"})
     return render(
         request,
         "settings.html",
         {
             "form": form,
             "branding_form": branding_form,
+            "language_form": language_form,
             "workspace": workspace,
         },
     )
@@ -175,10 +391,14 @@ def settings(request):
 # ---------------------------------------------------------------------------
 @login_required
 def companies(request):
-    qs = Company.objects.filter(
-        workspace=request.user.workspace, is_deleted=False
+    sort = _get_sort_param(request, "-created_at", ["name", "-name", "-created_at", "created_at"])
+    qs = (
+        Company.objects.filter(
+            workspace=request.user.workspace, is_deleted=False
+        )
+        .order_by(sort)
     )
-    return render(request, "companies/list.html", {"companies": qs})
+    return render(request, "companies/list.html", {"companies": qs, "current_sort": sort})
 
 
 @login_required
@@ -309,10 +529,14 @@ def company_bulk_delete(request):
 # ---------------------------------------------------------------------------
 @login_required
 def contacts(request):
-    qs = Contact.objects.filter(
-        workspace=request.user.workspace, is_deleted=False
+    sort = _get_sort_param(request, "-created_at", ["first_name", "-first_name", "-created_at", "created_at"])
+    qs = (
+        Contact.objects.filter(
+            workspace=request.user.workspace, is_deleted=False
+        )
+        .order_by(sort)
     )
-    return render(request, "contacts/list.html", {"contacts": qs})
+    return render(request, "contacts/list.html", {"contacts": qs, "current_sort": sort})
 
 
 def _resolve_location(request, *, country_field="country", state_field="state", city_field="city"):
@@ -625,13 +849,88 @@ def city_search(request):
 # Misc
 # ---------------------------------------------------------------------------
 @login_required
+@require_http_methods(["GET", "POST"])
 def import_export(request):
-    contacts_count = Contact.objects.filter(
-        workspace=request.user.workspace, is_deleted=False
-    ).count()
+    workspace = request.user.workspace
+    contacts = Contact.objects.filter(workspace=workspace, is_deleted=False)
+    import_result = None
+
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+        if action == "export":
+            fmt = (request.POST.get("export_format") or "csv").lower()
+            exporter = ie.EXPORTERS.get(fmt)
+            if exporter is None:
+                messages.error(request, "Unsupported export format.")
+                return redirect("import-export")
+            return exporter(contacts.order_by("first_name", "last_name"))
+
+        if action == "import":
+            fmt = (request.POST.get("file_format") or "").lower()
+            upload = request.FILES.get("file")
+            if not upload:
+                messages.error(request, "Please choose a file to import.")
+                return redirect("import-export")
+            importer = ie.IMPORTERS.get(fmt)
+            if importer is None:
+                messages.error(
+                    request,
+                    f"Unsupported import format: {fmt!s}. "
+                    "Use CSV, XLSX, VCF or JSON.",
+                )
+                return redirect("import-export")
+
+            try:
+                import_result = importer(
+                    upload,
+                    workspace=workspace,
+                    user=request.user,
+                )
+            except Exception as exc:  # noqa: BLE001
+                messages.error(request, f"Import failed: {exc}")
+                return redirect("import-export")
+
+            if import_result.get("created"):
+                messages.success(
+                    request,
+                    f"Imported {import_result['created']} contact"
+                    f"{'s' if import_result['created'] != 1 else ''} "
+                    f"from {import_result.get('source', 'file')}.",
+                )
+            elif import_result.get("errors"):
+                messages.warning(
+                    request,
+                    f"Import completed with issues. See the report below.",
+                )
+
+    contacts_count = contacts.count()
+    fields_meta = [
+        {
+            "canonical": canonical,
+            "label": label,
+            "description": ie.FIELD_DESCRIPTIONS.get(canonical, ""),
+        }
+        for canonical, label in ie.CONTACT_FIELDS
+    ]
     return render(
-        request, "import_export.html", {"contacts_count": contacts_count}
+        request,
+        "import_export.html",
+        {
+            "contacts_count": contacts_count,
+            "import_result": import_result,
+            "fields_meta": fields_meta,
+        },
     )
+
+
+@login_required
+def import_export_template(request, fmt):
+    fmt = (fmt or "").lower()
+    generator = ie.TEMPLATES.get(fmt)
+    if generator is None:
+        messages.error(request, f"No template available for format: {fmt!s}.")
+        return redirect("import-export")
+    return generator()
 
 
 def buttons(request):

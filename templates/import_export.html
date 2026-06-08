@@ -1,17 +1,62 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}Import / Export - CRM{% endblock %}
+{% block title %}{% trans "Import / Export" %} - CRM{% endblock %}
 
 {% block body %}
 <div class="flex min-h-screen bg-neutral-900">
     {% include 'includes/sidebar.html' %}
 
-    <!-- Main Content -->
     <main class="flex-1 ml-64 transition-all duration-300">
-        {% include 'includes/navbar.html' with navbar_title='Import / Export Contacts' %}
+        {% include 'includes/navbar.html' with navbar_title=_('Import / Export Contacts') %}
 
         <div class="p-6">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if import_result %}
+                <div class="mb-6 p-5 rounded-xl border border-neutral-700 bg-neutral-800">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 {% if import_result.created %}bg-green-600/20 text-green-400{% else %}bg-red-600/20 text-red-400{% endif %}">
+                            {% if import_result.created %}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            {% else %}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-semibold text-white mb-1">
+                                {{ import_result.source|default:_("Import") }} {% trans "result" %}
+                            </h3>
+                            <p class="text-sm text-gray-300">
+                                <span class="text-green-400 font-medium">{{ import_result.created }}</span>
+                                {% trans "contacts created" %},
+                                <span class="text-yellow-400 font-medium">{{ import_result.skipped|default:0 }}</span>
+                                {% trans "skipped" %},
+                                {% trans "from" %} <span class="text-purple-400 font-medium">{{ import_result.total|default:0 }}</span> {% trans "rows read" %}.
+                            </p>
+                            {% if import_result.errors %}
+                                <details class="mt-3">
+                                    <summary class="text-xs text-gray-400 cursor-pointer hover:text-gray-200">
+                                        {% trans "Show" %} {{ import_result.errors|length }} {% trans "issue" %}{{ import_result.errors|length|pluralize:"s" }}
+                                    </summary>
+                                    <ul class="mt-2 text-xs text-gray-400 space-y-1 max-h-48 overflow-y-auto">
+                                        {% for error in import_result.errors %}
+                                        <li class="font-mono">- {{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </details>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Import Section -->
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
@@ -22,42 +67,55 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-white">Import Contacts</h3>
-                            <p class="text-sm text-gray-400">Upload a file to import contacts</p>
+                            <h3 class="text-lg font-semibold text-white">{% trans "Import Contacts" %}</h3>
+                            <p class="text-sm text-gray-400">{% trans "Upload a file to import contacts" %}</p>
                         </div>
                     </div>
 
-                    <form method="post" enctype="multipart/form-data" action="{% url 'import-export' %}" class="space-y-4" id="import-form">
+                    <form method="post" enctype="multipart/form-data" action="{% url 'import-export' %}" class="space-y-4">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="import">
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Select File Format</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">{% trans "File format" %}</label>
                             <select name="file_format" id="import-format" class="w-full px-4 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-gray-300 focus:outline-none focus:border-purple-500">
                                 <option value="csv">CSV (Comma Separated Values)</option>
                                 <option value="xlsx">Excel (.xlsx)</option>
                                 <option value="vcf">vCard (.vcf)</option>
+                                <option value="json">JSON</option>
                             </select>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Select File</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">{% trans "File" %}</label>
                             <div class="border-2 border-dashed border-neutral-700 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
-                                <input type="file" name="file" id="import-file" required>
-                                <label for="import-file" class="cursor-pointer">
-                                    <svg class="w-10 h-10 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                                    </svg>
-                                    <p class="text-sm text-gray-400">Click to select or drag and drop</p>
-                                    <p class="text-xs text-gray-500 mt-1">CSV, XLSX, or VCF files</p>
-                                </label>
-                                <p id="file-name" class="mt-3 text-sm text-purple-400 hidden"></p>
+                                <input type="file" name="file" id="import-file" required class="block w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-purple-600 file:text-white file:font-medium hover:file:bg-purple-700">
+                                <p class="mt-3 text-xs text-gray-500">{% trans "CSV, XLSX, VCF or JSON. Column order doesn't matter — matching is done by header name." %}</p>
+                                <p id="file-name" class="mt-2 text-sm text-purple-400 hidden"></p>
                             </div>
                         </div>
 
                         <button type="submit" class="w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
-                            Import Contacts
+                            {% trans "Import Contacts" %}
                         </button>
+
+                        <div class="pt-4 border-t border-neutral-700">
+                            <p class="text-xs text-gray-400 mb-3">{% trans "Need a starting point? Download a template:" %}</p>
+                            <div class="flex flex-wrap gap-2">
+                                <a href="{% url 'import-export-template' 'csv' %}" class="inline-flex items-center gap-2 px-3 py-2 bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-gray-300 text-xs font-medium rounded-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    {% trans "CSV template" %}
+                                </a>
+                                <a href="{% url 'import-export-template' 'xlsx' %}" class="inline-flex items-center gap-2 px-3 py-2 bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-gray-300 text-xs font-medium rounded-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    {% trans "Excel template" %}
+                                </a>
+                                <a href="{% url 'import-export-template' 'vcf' %}" class="inline-flex items-center gap-2 px-3 py-2 bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-gray-300 text-xs font-medium rounded-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    {% trans "vCard template" %}
+                                </a>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -66,12 +124,12 @@
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-white">Export Contacts</h3>
-                            <p class="text-sm text-gray-400">Download all your contacts</p>
+                            <h3 class="text-lg font-semibold text-white">{% trans "Export Contacts" %}</h3>
+                            <p class="text-sm text-gray-400">{% trans "Download all your contacts" %}</p>
                         </div>
                     </div>
 
@@ -80,7 +138,7 @@
                         <input type="hidden" name="action" value="export">
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Select Export Format</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">{% trans "Export format" %}</label>
                             <select name="export_format" class="w-full px-4 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-gray-300 focus:outline-none focus:border-purple-500">
                                 <option value="csv">CSV (Comma Separated Values)</option>
                                 <option value="xlsx">Excel (.xlsx)</option>
@@ -90,43 +148,77 @@
                         </div>
 
                         <div class="p-4 bg-neutral-900/50 rounded-lg">
-                            <p class="text-sm text-gray-400">This will export all <span class="text-purple-400 font-medium">{{ contacts_count|default:0 }}</span> contacts from your workspace.</p>
+                            <p class="text-sm text-gray-400">
+                                {% trans "This will export all" %}
+                                <span class="text-purple-400 font-medium">{{ contacts_count|default:0 }}</span>
+                                {% trans "contacts from your workspace" %}.
+                            </p>
                         </div>
 
                         <button type="submit" class="w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
-                            Export Contacts
+                            {% trans "Export Contacts" %}
                         </button>
                     </form>
                 </div>
             </div>
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mt-6 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <!-- Format Help -->
+            <!-- Column mapping reference -->
             <div class="mt-8 bg-neutral-800 rounded-xl border border-neutral-700 p-6">
-                <h3 class="text-lg font-semibold text-white mb-4">Supported Formats</h3>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-9 h-9 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">{% trans "Column mapping reference" %}</h3>
+                        <p class="text-sm text-gray-400">{% trans "For CSV and XLSX, the importer matches columns by header name — order does not matter. Synonyms in English and Spanish are accepted." %}</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-neutral-700 text-left">
+                                <th class="py-2 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">{% trans "Field" %}</th>
+                                <th class="py-2 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">{% trans "Accepted header names (EN + ES)" %}</th>
+                                <th class="py-2 px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">{% trans "Notes" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-700/60">
+                            {% for field in fields_meta %}
+                            <tr>
+                                <td class="py-2 px-3 text-white font-medium">{{ field.label }}</td>
+                                <td class="py-2 px-3 text-gray-400">
+                                    <code class="text-xs bg-neutral-900 px-1.5 py-0.5 rounded text-purple-300">{{ field.canonical }}</code>
+                                </td>
+                                <td class="py-2 px-3 text-gray-400 text-xs">{% translate field.description %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-4 text-xs text-gray-500">
+                    {% trans "For" %} <strong>vCard (.vcf)</strong>, {% trans "the standard vCard 3.0 properties are used" %} (<code>FN</code>, <code>N</code>, <code>EMAIL</code>, <code>TEL</code>, <code>ORG</code>, <code>ADR</code>, <code>BDAY</code>, <code>URL</code>, <code>NOTE</code>, <code>X-DISCORD</code>, etc.). {% trans "For" %} <strong>JSON</strong>, {% trans "use the same field names as in the CSV headers (camelCase is also accepted)" %}.
+                </p>
+            </div>
+
+            <!-- Format cheat sheet -->
+            <div class="mt-6 bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                <h3 class="text-lg font-semibold text-white mb-4">{% trans "Supported formats" %}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="p-4 bg-neutral-900/50 rounded-lg">
                         <h4 class="text-sm font-medium text-white mb-1">CSV</h4>
-                        <p class="text-xs text-gray-400">Comma-separated values. Best for spreadsheet compatibility.</p>
+                        <p class="text-xs text-gray-400">{% trans "Comma-separated values. The safest choice — every spreadsheet app can read it." %}</p>
                     </div>
                     <div class="p-4 bg-neutral-900/50 rounded-lg">
                         <h4 class="text-sm font-medium text-white mb-1">Excel (.xlsx)</h4>
-                        <p class="text-xs text-gray-400">Microsoft Excel format. Good for large datasets.</p>
+                        <p class="text-xs text-gray-400">{% trans "Microsoft Excel. The first row must contain the column headers." %}</p>
                     </div>
                     <div class="p-4 bg-neutral-900/50 rounded-lg">
                         <h4 class="text-sm font-medium text-white mb-1">vCard (.vcf)</h4>
-                        <p class="text-xs text-gray-400">Standard contact format. Compatible with most apps.</p>
+                        <p class="text-xs text-gray-400">{% trans "Standard contact format. Compatible with macOS Contacts, Google Contacts, Outlook, iOS and Android." %}</p>
                     </div>
                     <div class="p-4 bg-neutral-900/50 rounded-lg">
                         <h4 class="text-sm font-medium text-white mb-1">JSON</h4>
-                        <p class="text-xs text-gray-400">Machine-readable format. Best for developers.</p>
+                        <p class="text-xs text-gray-400">{% trans "List of contact objects. Useful for developers and migrations from other systems." %}</p>
                     </div>
                 </div>
             </div>
@@ -141,11 +233,12 @@ document.getElementById('import-format').addEventListener('change', function() {
     const fileInput = document.getElementById('import-file');
     const format = this.value;
     const extensions = {
-        'csv': '.csv',
+        'csv': '.csv,.txt',
         'xlsx': '.xlsx',
-        'vcf': '.vcf'
+        'vcf': '.vcf',
+        'json': '.json'
     };
-    fileInput.accept = extensions[format];
+    fileInput.accept = extensions[format] || '';
 });
 
 document.getElementById('import-file').addEventListener('change', function() {

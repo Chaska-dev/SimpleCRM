@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Birthdays" %} - CRM{% endblock %}
+
+{% block body %}
+<div class="flex min-h-screen bg-neutral-900">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="flex-1 ml-64 transition-all duration-300">
+        {% include 'includes/navbar.html' with navbar_title=_('Birthdays') %}
+
+        <div class="p-5">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                <!-- Monthly Calendar (compact) -->
+                <div class="lg:col-span-2 bg-neutral-800 rounded-xl border border-neutral-700 p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <a href="{{ prev_month_link }}" class="p-1.5 text-gray-400 hover:text-white hover:bg-neutral-700 rounded-lg transition-colors" title="Previous month">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </a>
+                        <div class="text-center">
+                            <h3 class="text-sm font-semibold text-white">{{ calendar_month_name }} {{ calendar_year }}</h3>
+                            {% if is_current_month %}
+                            <p class="text-[10px] text-purple-400 font-medium uppercase tracking-wider">{% trans "Current" %}</p>
+                            {% endif %}
+                        </div>
+                        <a href="{{ next_month_link }}" class="p-1.5 text-gray-400 hover:text-white hover:bg-neutral-700 rounded-lg transition-colors" title="Next month">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 text-[10px] text-gray-500 mb-2">
+                        <span class="flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                            {% trans "Birthday" %}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
+                            {% trans "Today" %}
+                        </span>
+                    </div>
+
+                    <!-- Weekday headers -->
+                    <div class="grid grid-cols-7 gap-1 mb-1">
+                        {% for day in weekday_names %}
+                        <div class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider py-1">
+                            {{ day|slice:":1" }}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Day grid (compact, h-12 cells) -->
+                    <div class="grid grid-cols-7 gap-1">
+                        {% for week in calendar_weeks %}
+                            {% for day in week %}
+                            {% if day.day == "" %}
+                            <div class="h-12"></div>
+                            {% else %}
+                            <a href="?month={{ calendar_year }}-{{ calendar_month_num|stringformat:'02d' }}&day={{ day.date|date:'Y-m-d' }}"
+                               class="h-12 flex flex-col items-center justify-center rounded-md text-xs border transition-colors relative
+                                {% if day.is_today %}bg-purple-600 text-white font-bold border-purple-400 shadow-md shadow-purple-600/20
+                                {% elif day.is_selected %}bg-purple-500 text-white font-bold border-purple-300 ring-2 ring-purple-400/40
+                                {% elif day.birthdays %}bg-purple-600/15 text-purple-300 font-semibold border-purple-600/30 hover:bg-purple-600/25
+                                {% elif day.is_past %}text-gray-600 border-transparent hover:bg-neutral-700/40
+                                {% else %}text-gray-300 border-transparent hover:bg-neutral-700/50
+                                {% endif %}"
+                               {% if day.birthdays %}title="{% for b in day.birthdays %}{{ b.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"{% endif %}>
+                                <span class="leading-none">{{ day.day }}</span>
+                                {% if day.birthdays %}
+                                <div class="flex gap-0.5 mt-0.5">
+                                    {% for b in day.birthdays %}
+                                    <span class="w-1 h-1 rounded-full {% if day.is_today or day.is_selected %}bg-white{% else %}bg-purple-400{% endif %}"></span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </a>
+                            {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Side panel: selected day OR month birthdays -->
+                <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4">
+                    {% if selected_day %}
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">{{ selected_day|date:"l, F j" }}</h3>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-wider">{% trans "Selected day" %}</p>
+                        </div>
+                        <a href="?month={{ calendar_year }}-{{ calendar_month_num|stringformat:'02d' }}" class="text-[10px] text-purple-400 hover:text-purple-300 transition-colors uppercase tracking-wider">{% trans "Clear" %}</a>
+                    </div>
+
+                    {% if selected_day_birthdays %}
+                    <div class="space-y-2">
+                        {% for item in selected_day_birthdays %}
+                        <a href="{% url 'contact-edit' item.contact.uuid %}" class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-neutral-700/50 transition-colors">
+                            {% if item.contact.avatar %}
+                            <img src="{{ item.contact.avatar.url }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                                {{ item.contact.first_name.0|default:'?'|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-white truncate">{{ item.contact.full_name }}</p>
+                                <p class="text-[10px] text-gray-400">
+                                    {% if item.turning %}{% trans "Turns" %} {{ item.turning }}{% else %}{% trans "Birthday" %}{% endif %}
+                                </p>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-6">
+                        <p class="text-xs text-gray-400">{% trans "No birthdays on this day" %}</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">{{ calendar_month_name }}</h3>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-wider">{% trans "Click a day to inspect" %}</p>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded-full bg-purple-600/20 text-purple-300 text-[10px] font-semibold">
+                            {{ month_birthdays|length }}
+                        </span>
+                    </div>
+
+                    {% if month_birthdays %}
+                    <div class="space-y-1.5 max-h-[400px] overflow-y-auto pr-1">
+                        {% for item in month_birthdays %}
+                        <a href="?month={{ calendar_year }}-{{ calendar_month_num|stringformat:'02d' }}&day={{ item.next_date|date:'Y-m-d' }}"
+                           class="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-neutral-700/50 transition-colors group">
+                            {% if item.contact.avatar %}
+                            <img src="{{ item.contact.avatar.url }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0">
+                                {{ item.contact.first_name.0|default:'?'|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-white truncate">{{ item.contact.full_name }}</p>
+                                <p class="text-[10px] text-gray-400">{{ item.next_date|date:"M j" }}{% if item.turning %} · {{ item.turning }}{% endif %}</p>
+                            </div>
+                            <span class="text-[10px] text-gray-500 flex-shrink-0 group-hover:text-purple-400 transition-colors">{{ item.next_date|date:"D" }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-6">
+                        <p class="text-xs text-gray-400">{% trans "No birthdays in" %} {{ calendar_month_name }}</p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- All upcoming (year-round) -->
+            <div class="mt-5 bg-neutral-800 rounded-xl border border-neutral-700 p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-white">{% trans "All upcoming" %}</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">{% trans "Sorted by next birthday" %}</p>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded-full bg-purple-600/20 text-purple-300 text-[10px] font-semibold">
+                        {{ all_upcoming|length }}
+                    </span>
+                </div>
+
+                {% if all_upcoming %}
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                    {% for item in all_upcoming %}
+                    <a href="{% url 'contact-edit' item.contact.uuid %}" class="flex items-center gap-2 p-2 rounded-lg bg-neutral-900/50 border border-neutral-700/50 hover:border-purple-500/50 hover:bg-neutral-700/30 transition-colors">
+                        {% if item.contact.avatar %}
+                        <img src="{{ item.contact.avatar.url }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0">
+                            {{ item.contact.first_name.0|default:'?'|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs text-white truncate">{{ item.contact.full_name }}</p>
+                            <p class="text-[10px] text-gray-400">{{ item.next_date|date:"M j" }}</p>
+                        </div>
+                        {% if item.days_away == 0 %}
+                        <span class="px-1.5 py-0.5 rounded-full bg-purple-600 text-white text-[9px] font-bold uppercase tracking-wider flex-shrink-0">{% trans "Now" %}</span>
+                        {% else %}
+                        <span class="text-[10px] text-gray-500 flex-shrink-0 whitespace-nowrap">{{ item.days_away }}d</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="w-10 h-10 mx-auto mb-2 bg-neutral-700 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-400">{% trans "No upcoming birthdays" %}</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">{% trans "Add a birthday to your contacts to see them here." %}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

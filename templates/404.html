@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - CRM</title>
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-neutral-900 text-gray-100 min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md w-full text-center">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-purple-600/20 mb-6">
+            <svg class="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+
+        <h1 class="text-7xl font-bold text-white mb-2">404</h1>
+        <h2 class="text-xl font-semibold text-white mb-2">Page not found</h2>
+        <p class="text-sm text-gray-400 mb-8">
+            The page you're looking for doesn't exist or has been moved.
+        </p>
+
+        {% if exception %}
+        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-3 mb-6 text-left">
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Requested URL</p>
+            <code class="text-xs text-purple-400 font-mono break-all">{{ request.path }}</code>
+        </div>
+        {% endif %}
+
+        <div class="flex items-center justify-center gap-3">
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Go to Dashboard
+            </a>
+            <button onclick="history.back()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-medium rounded-lg transition-colors">
+                Go Back
+            </button>
+        </div>
+    </div>
+</body>
+</html>

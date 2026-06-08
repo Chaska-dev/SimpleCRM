@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Edit {{ company.name }} - CRM{% endblock %}
+{% block title %}{% trans "Edit" %} {{ company.name }} - CRM{% endblock %}
 
 {% block body %}
 <div class="flex min-h-screen bg-neutral-900">
@@ -106,10 +107,10 @@
                 <!-- Form Actions -->
                 <div class="mt-6 flex justify-end gap-3">
                     <a href="{% url 'companies' %}" class="px-4 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-medium rounded-lg transition-colors">
-                        Cancel
+                        {% trans "Cancel" %}
                     </a>
                     <button type="submit" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
-                        Update Company
+                        {% trans "Update Company" %}
                     </button>
                 </div>
             </form>
