@@ -64,6 +64,8 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+# Output of `manage.py collectstatic` (production asset bundle)
+staticfiles/
 
 # Flask stuff:
 instance/

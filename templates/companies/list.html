@@ -26,7 +26,7 @@
                 <!-- New Company Button -->
                 <a href="{% url 'company-create' %}" class="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m0-6H6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
                     <span>{% trans "New Company" %}</span>
                 </a>
@@ -49,42 +49,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
                     </svg>
                 </div>
-                <!-- Column Filter -->
-                <div class="relative">
-                    <button id="columnSelectorBtn" class="flex items-center gap-2 px-3 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-medium rounded-lg transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                        </svg>
-                        <span>{% trans "Columns" %}</span>
-                    </button>
-                    <div id="columnSelectorDropdown" class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-600 rounded-xl shadow-2xl z-50 overflow-hidden">
-                        <div class="px-4 py-3 bg-neutral-900/50 border-b border-neutral-700">
-                            <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">{% trans "Visible Columns" %}</p>
-                        </div>
-                        <div class="p-2 space-y-1">
-                            <label class="flex items-center gap-3 px-3 py-2.5 hover:bg-neutral-700/50 rounded-lg cursor-pointer group">
-                                <input type="checkbox" data-column="name" class="column-checkbox w-4 h-4 rounded border-gray-500 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800 cursor-not-allowed" checked disabled>
-                                <span class="text-sm font-medium text-gray-200 group-hover:text-white">{% trans "Name" %}</span>
-                            </label>
-                            <label class="flex items-center gap-3 px-3 py-2.5 hover:bg-neutral-700/50 rounded-lg cursor-pointer group">
-                                <input type="checkbox" data-column="industry" class="column-checkbox w-4 h-4 rounded border-gray-500 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800" checked>
-                                <span class="text-sm text-gray-300 group-hover:text-white">{% trans "Industry" %}</span>
-                            </label>
-                            <label class="flex items-center gap-3 px-3 py-2.5 hover:bg-neutral-700/50 rounded-lg cursor-pointer group">
-                                <input type="checkbox" data-column="phone" class="column-checkbox w-4 h-4 rounded border-gray-500 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800" checked>
-                                <span class="text-sm text-gray-300 group-hover:text-white">{% trans "Phone" %}</span>
-                            </label>
-                            <label class="flex items-center gap-3 px-3 py-2.5 hover:bg-neutral-700/50 rounded-lg cursor-pointer group">
-                                <input type="checkbox" data-column="email" class="column-checkbox w-4 h-4 rounded border-gray-500 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800" checked>
-                                <span class="text-sm text-gray-300 group-hover:text-white">{% trans "Email" %}</span>
-                            </label>
-                            <label class="flex items-center gap-3 px-3 py-2.5 hover:bg-neutral-700/50 rounded-lg cursor-pointer group">
-                                <input type="checkbox" data-column="country" class="column-checkbox w-4 h-4 rounded border-gray-500 bg-neutral-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-neutral-800">
-                                <span class="text-sm text-gray-300 group-hover:text-white">{% trans "Country" %}</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
                 <!-- Bulk Delete Button -->
                 <button id="deleteSelectedBtn" class="flex items-center gap-2 px-3 py-2.5 bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,12 +63,12 @@
                     <colgroup>
                         <col style="width: 2.5rem;">
                         <col style="width: 3.5rem;">
-                        <col data-col="name" style="min-width: 12rem;">
-                        <col data-col="industry" class="!hidden md:!table-cell" style="width: 12rem;">
-                        <col data-col="website" class="!hidden md:!table-cell" style="width: 16rem;">
-                        <col data-col="phone" class="!hidden md:!table-cell" style="width: 12rem;">
-                        <col data-col="email" class="!hidden md:!table-cell" style="width: 14rem;">
-                        <col data-col="country" class="!hidden" style="width: 10rem;">
+                        <col data-col="name">
+                        <col data-col="industry" style="width: 12rem;">
+                        <col data-col="website" style="width: 16rem;">
+                        <col data-col="phone" style="width: 12rem;">
+                        <col data-col="email" style="width: 14rem;">
+                        <col data-col="country" style="width: 10rem;">
                         <col style="width: 6rem;">
                     </colgroup>
                     <thead class="bg-neutral-900">
@@ -118,16 +82,16 @@
                             <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate" data-col="name">
                                 {% trans "Name" %}
                             </th>
-                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate hidden md:table-cell" data-col="industry">
+                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate" data-col="industry">
                                 {% trans "Industry" %}
                             </th>
-                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate hidden md:table-cell" data-col="phone">
+                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate" data-col="phone">
                                 {% trans "Phone" %}
                             </th>
-                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate hidden md:table-cell" data-col="email">
+                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate" data-col="email">
                                 {% trans "Email" %}
                             </th>
-                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate hidden" data-col="country">
+                            <th class="py-3 px-3 bg-neutral-900 text-left text-xs font-medium text-gray-400 uppercase tracking-wider truncate" data-col="country">
                                 {% trans "Country" %}
                             </th>
                             <th class="py-3 px-2 bg-neutral-900 text-center text-xs font-medium text-gray-400 uppercase tracking-wider truncate">{% trans "Actions" %}</th>
@@ -162,10 +126,10 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td class="py-3 px-3 text-sm text-gray-400 truncate hidden md:table-cell" data-col="industry" title="{{ company.industry|default:'' }}">{{ company.industry|default:'-' }}</td>
-                            <td class="py-3 px-3 text-sm text-gray-400 truncate hidden md:table-cell" data-col="phone" title="{{ company.phone|default:'' }}">{{ company.phone|default:'-' }}</td>
-                            <td class="py-3 px-3 text-sm text-gray-400 truncate hidden md:table-cell" data-col="email" title="{{ company.email|default:'' }}">{{ company.email|default:'-' }}</td>
-                            <td class="py-3 px-3 text-sm text-gray-400 truncate hidden" data-col="country">-</td>
+                            <td class="py-3 px-3 text-sm text-gray-400 truncate" data-col="industry" title="{{ company.industry|default:'' }}">{{ company.industry|default:'-' }}</td>
+                            <td class="py-3 px-3 text-sm text-gray-400 truncate" data-col="phone" title="{{ company.phone|default:'' }}">{{ company.phone|default:'-' }}</td>
+                            <td class="py-3 px-3 text-sm text-gray-400 truncate" data-col="email" title="{{ company.email|default:'' }}">{{ company.email|default:'-' }}</td>
+                            <td class="py-3 px-3 text-sm text-gray-400 truncate" data-col="country">-</td>
                             <td class="py-3 px-2">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{% url 'company-edit' company.uuid %}" class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-600/10 rounded-lg transition-colors" title="Edit">
@@ -199,7 +163,7 @@
                 <p class="text-gray-400 mb-6">{% trans "Create your first company to get started." %}</p>
                 <a href="{% url 'company-create' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m0-6H6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
                     {% trans "Add Company" %}
                 </a>
@@ -348,44 +312,6 @@ document.getElementById('companySearch').addEventListener('input', function(e) {
     rows.forEach(function(row) {
         const text = row.textContent.toLowerCase();
         row.style.display = text.includes(query) ? '' : 'none';
-    });
-});
-
-document.getElementById('columnSelectorBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    const dropdown = document.getElementById('columnSelectorDropdown');
-    dropdown.classList.toggle('hidden');
-});
-
-document.addEventListener('click', function(e) {
-    const dropdown = document.getElementById('columnSelectorDropdown');
-    const btn = document.getElementById('columnSelectorBtn');
-    if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-        dropdown.classList.add('hidden');
-    }
-});
-
-document.querySelectorAll('.column-checkbox').forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
-        const column = this.dataset.column;
-        const isChecked = this.checked;
-
-        document.querySelectorAll('th[data-col="' + column + '"], td[data-col="' + column + '"]').forEach(function(el) {
-            if (isChecked) {
-                el.classList.remove('!hidden');
-            } else {
-                el.classList.add('!hidden');
-            }
-        });
-
-        const col = document.querySelector('colgroup col[data-col="' + column + '"]');
-        if (col) {
-            if (isChecked) {
-                col.classList.remove('!hidden');
-            } else {
-                col.classList.add('!hidden');
-            }
-        }
     });
 });
 

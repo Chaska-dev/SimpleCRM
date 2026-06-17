@@ -114,6 +114,22 @@
         max-width: 0;
         margin-left: 0;
     }
+
+    /* ---- Bottom user section avatar ----
+       The avatar is w-9 h-9 (36px) by default. The collapsed sidebar
+       has only 32px of horizontal space (64px width - 32px padding),
+       so the avatar was getting clipped on the right and rendered
+       as a vertical oval (32 wide x 36 tall). Force it to fit. */
+    #sidebar-user > a > img,
+    #sidebar-user > a > div.rounded-full {
+        flex-shrink: 0;
+    }
+    #sidebar.is-collapsed #sidebar-user > a > img,
+    #sidebar.is-collapsed #sidebar-user > a > div.rounded-full {
+        width: 2rem;   /* 32px - matches the available horizontal space */
+        height: 2rem;
+        font-size: 0.75rem;  /* shrink the initial letter in the placeholder */
+    }
 </style>
 
 <aside id="sidebar" class="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col fixed left-0 top-0 h-screen z-50 overflow-hidden">

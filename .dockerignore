@@ -1,0 +1,62 @@
+# ---- Git / VCS -------------------------------------------------------------
+.git
+.gitattributes
+.github
+.gitignore
+
+# ---- Python ----------------------------------------------------------------
+__pycache__
+**/__pycache__
+*.py[cod]
+*$py.class
+*.so
+.venv
+venv/
+env/
+.python-version
+*.egg-info
+build/
+dist/
+*.spec
+
+# ---- Test / coverage -------------------------------------------------------
+.pytest_cache
+.coverage
+.coverage.*
+htmlcov
+.tox
+.nox
+
+# ---- Django runtime artefacts (never bake a developer's DB into the image) -
+db.sqlite3
+db.sqlite3-journal
+local_settings.py
+*.log
+
+# ---- User-uploaded media (logos, avatars) ----------------------------------
+media/*
+!media/.gitkeep
+
+# ---- Tailwind dev cache ----------------------------------------------------
+theme/static/css
+theme/static/.bin
+
+# ---- IDE / editor ----------------------------------------------------------
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ---- Env / secrets ---------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---- Local helper scripts that are not needed inside the image -------------
+# (dockerfile and docker-compose.yaml are NOT ignored — the build needs them)
+.dockerignore
+README.md
+LICENSE
+*.md

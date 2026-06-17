@@ -91,6 +91,33 @@ class LanguagePreferenceForm(forms.Form):
     )
 
 
+class ProfileForm(forms.ModelForm):
+    """Edit the signed-in user's own profile (first/last name + email).
+
+    Username is intentionally NOT exposed here — changing it has wider
+    implications (URLs, mentions, audit trails) and should be a separate
+    flow if ever needed.
+    """
+
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+        widgets = {
+            "first_name": forms.TextInput(attrs={
+                "class": INPUT_CLASSES,
+                "placeholder": "First name",
+            }),
+            "last_name": forms.TextInput(attrs={
+                "class": INPUT_CLASSES,
+                "placeholder": "Last name",
+            }),
+            "email": forms.EmailInput(attrs={
+                "class": INPUT_CLASSES,
+                "placeholder": "you@example.com",
+            }),
+        }
+
+
 class WorkspaceSettingsForm(forms.ModelForm):
     class Meta:
         model = Workspace

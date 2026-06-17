@@ -1,0 +1,31 @@
+{% comment %}
+Social icons include.
+
+Renders a single social media icon as either a link (when the URL is present)
+or a dimmed placeholder (when the URL is missing).
+
+Parameters (via `with`):
+    - url: the social URL (string). If empty/None, renders a placeholder.
+    - title: tooltip text (string)
+    - bg: background color class (e.g. "bg-[#0077B5]/20")
+    - hover: hover color class (e.g. "hover:bg-[#0077B5]/40")
+    - color: SVG color class (e.g. "text-[#0077B5]")
+    - icon: name of the icon (string: linkedin, github, facebook, instagram,
+            twitter, tiktok, youtube, telegram, discord, link)
+    - copy: if set and truthy, render as a copy-to-clipboard div (for Discord handles)
+    - copy_value: the value to copy (string)
+{% endcomment %}
+
+{% if url %}
+    <a href="{{ url }}" target="_blank" class="w-8 h-8 rounded-md {{ bg }} flex items-center justify-center {{ hover }} transition-colors" title="{{ title }}">
+        {% include "includes/_social_icon_svg.html" with icon=icon color=color %}
+    </a>
+{% elif copy and copy_value %}
+    <div class="w-8 h-8 rounded-md {{ bg }} flex items-center justify-center cursor-pointer {{ hover }} transition-colors" title="{{ title }}: {{ copy_value }}" onclick="copyToClipboard('{{ copy_value }}', this)">
+        {% include "includes/_social_icon_svg.html" with icon=icon color=color %}
+    </div>
+{% else %}
+    <div class="w-8 h-8 rounded-md bg-gray-700/30 flex items-center justify-center opacity-30">
+        {% include "includes/_social_icon_svg.html" with icon=icon color="text-gray-600" %}
+    </div>
+{% endif %}

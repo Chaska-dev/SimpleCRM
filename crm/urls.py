@@ -15,7 +15,6 @@ urlpatterns = [
     path("settings/", views.settings, name="settings"),
     path("import-export/", views.import_export, name="import-export"),
     path("import-export/template/<str:fmt>/", views.import_export_template, name="import-export-template"),
-    path("buttons/", views.buttons, name="buttons"),
 
     # Contacts
     path("contacts/", views.contacts, name="contacts"),

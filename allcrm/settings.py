@@ -172,6 +172,14 @@ DATABASES = _build_databases()
 
 AUTH_USER_MODEL = "crm.User"
 
+# Where unauthenticated users are sent by @login_required.
+# Default is /accounts/login/, which does not exist in this project.
+LOGIN_URL = "login"
+# Where to send users after a successful login. The login view in
+# crm.views.login_view does this explicitly with redirect("dashboard"),
+# so this default is here for symmetry / future use.
+LOGIN_REDIRECT_URL = "dashboard"
+
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",
     "django.contrib.auth.backends.ModelBackend",
@@ -211,5 +219,8 @@ LANGUAGE_COOKIE_PATH = "/"
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [STATIC_DIR]
+# Where `collectstatic` dumps everything for the WSGI server to serve.
+# In Docker this path is a named volume (see docker-compose.yaml).
+STATIC_ROOT = os.environ.get("STATIC_ROOT", os.path.join(BASE_DIR, "staticfiles"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

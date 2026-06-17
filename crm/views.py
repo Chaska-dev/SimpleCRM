@@ -6,21 +6,30 @@ The image upload pipeline is shared through :mod:`crm.utils`.
 
 from __future__ import annotations
 
+import calendar as cal_mod
 import json
+from datetime import date
 
+from django.conf import settings as dj_settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.core.cache import cache
 from django.http import JsonResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.utils import translation
-from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST, require_http_methods
+from django.utils import translation
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_http_methods, require_POST
 
-from .forms import LoginForm, UserRegistrationForm, WorkspaceBrandingForm
+from . import import_export as ie
+from .forms import (
+    LanguagePreferenceForm,
+    LoginForm,
+    ProfileForm,
+    UserRegistrationForm,
+    WorkspaceBrandingForm,
+)
 from .models import City, Company, Contact, Country, State
 from .utils import (
     crop_and_save_image,
@@ -28,15 +37,6 @@ from .utils import (
     parse_uuids,
     search_location,
 )
-from . import import_export as ie
-
-
-# ---------------------------------------------------------------------------
-# Auth
-# ---------------------------------------------------------------------------
-def register(request):
-    if request.user.is_authenticated:
-        return redirect("dashboard")
 
 
 # ---------------------------------------------------------------------------
@@ -44,8 +44,35 @@ def register(request):
 # ---------------------------------------------------------------------------
 def custom_404(request, exception=None):
     """Custom 404 handler. Renders templates/404.html with status 404."""
-    response = render(request, "404.html", status=404)
-    return response
+    return render(request, "404.html", status=404)
+
+
+# ---------------------------------------------------------------------------
+# Root redirect
+# ---------------------------------------------------------------------------
+def root_redirect(request):
+    """Send the visitor to the right place in a single hop.
+
+    - Authenticated users go straight to the dashboard.
+    - Everyone else goes to the login page (no ``?next=`` cruft).
+
+    This used to be a chain of two redirects (``/`` -> ``/dashboard/`` -> login
+    via ``@login_required``), which added an unnecessary round-trip and a
+    ``?next=/dashboard/`` query string on the login URL. Centralising the
+    decision here makes the intent explicit and easier to test.
+    """
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    return redirect("login")
+
+
+# ---------------------------------------------------------------------------
+# Auth
+# ---------------------------------------------------------------------------
+@require_http_methods(["GET", "POST"])
+def register(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
 
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
@@ -103,9 +130,6 @@ def set_language(request):
     the User record (so it survives session expiry) and to the session
     (so it wins over the browser's Accept-Language header).
     """
-    from django.conf import settings as dj_settings
-    from django.utils.translation import gettext_lazy as _
-
     next_url = request.POST.get("next") or request.META.get("HTTP_REFERER") or "/dashboard/"
     lang = request.POST.get("language", "").strip()
     supported = {code for code, _ in dj_settings.LANGUAGES}
@@ -137,16 +161,18 @@ def set_language(request):
 # ---------------------------------------------------------------------------
 # Dashboard / settings
 # ---------------------------------------------------------------------------
-@login_required
 def _get_sort_param(request, default, allowed):
     """Get sort parameter from request, validated against allowed options."""
     sort = request.GET.get("sort", default)
     return sort if sort in allowed else default
 
 
+@login_required
 def dashboard(request):
     workspace = request.user.workspace
-    sort = _get_sort_param(request, "-created_at", ["first_name", "-first_name", "-created_at", "created_at"])
+    sort = _get_sort_param(
+        request, "-created_at", ["first_name", "-first_name", "-created_at", "created_at"]
+    )
     contacts = (
         Contact.objects.filter(workspace=workspace, is_deleted=False)
         .select_related()
@@ -170,9 +196,6 @@ def dashboard(request):
 
 @login_required
 def birthdays(request):
-    import calendar as cal_mod
-    from datetime import date
-
     workspace = request.user.workspace
     today = date.today()
 
@@ -342,7 +365,19 @@ def settings(request):
         return redirect("settings")
 
     if request.method == "POST":
-        if request.POST.get("_action") == "branding":
+        action = request.POST.get("_action")
+
+        if action == "profile":
+            profile_form = ProfileForm(request.POST, instance=user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Profile updated successfully!")
+            else:
+                for err in profile_form.errors.get_json_data(escape_html=True).values():
+                    messages.error(request, "; ".join(e["message"] for e in err))
+            return redirect("settings")
+
+        if action == "branding":
             branding_form = WorkspaceBrandingForm(
                 request.POST, request.FILES, instance=workspace
             )
@@ -353,13 +388,11 @@ def settings(request):
                 for error in branding_form.errors.get_json_data(escape_html=True).values():
                     messages.error(request, "; ".join(e["message"] for e in error))
             return redirect("settings")
-        if request.POST.get("_action") == "remove_logo" and workspace.logo:
+        if action == "remove_logo" and workspace.logo:
             workspace.logo.delete(save=False)
             workspace.save()
             messages.success(request, "Workspace logo removed.")
             return redirect("settings")
-
-        from django.contrib.auth.forms import PasswordChangeForm
 
         form = PasswordChangeForm(user, request.POST)
         if form.is_valid():
@@ -367,13 +400,11 @@ def settings(request):
             messages.success(request, "Password updated successfully!")
             return redirect("settings")
     else:
-        from django.contrib.auth.forms import PasswordChangeForm
-
         form = PasswordChangeForm(user)
 
     branding_form = WorkspaceBrandingForm(instance=workspace)
-    from .forms import LanguagePreferenceForm
     language_form = LanguagePreferenceForm(initial={"language": user.language or "en"})
+    profile_form = ProfileForm(instance=user)
     return render(
         request,
         "settings.html",
@@ -381,6 +412,7 @@ def settings(request):
             "form": form,
             "branding_form": branding_form,
             "language_form": language_form,
+            "profile_form": profile_form,
             "workspace": workspace,
         },
     )
@@ -931,7 +963,3 @@ def import_export_template(request, fmt):
         messages.error(request, f"No template available for format: {fmt!s}.")
         return redirect("import-export")
     return generator()
-
-
-def buttons(request):
-    return render(request, "buttons.html")

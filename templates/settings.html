@@ -179,50 +179,70 @@
                     <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-5">
                         <h3 class="text-base font-semibold text-white mb-4">{% trans "Profile" %}</h3>
 
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <!-- Avatar column -->
-                            <div class="flex sm:flex-col items-center justify-center gap-3 sm:w-32 flex-shrink-0">
-                                <div class="relative">
-                                    {% if user.avatar %}
-                                    <img src="{{ user.avatar.url }}" class="w-24 h-24 rounded-full object-cover" alt="{{ user.get_full_name }}">
-                                    {% else %}
-                                    <div class="w-24 h-24 rounded-full bg-purple-600 flex items-center justify-center text-white text-xl font-medium">
-                                        {{ user.first_name.0|default:user.username.0|upper }}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="_action" value="profile">
+
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <!-- Avatar column -->
+                                <div class="flex sm:flex-col items-center justify-center gap-3 sm:w-32 flex-shrink-0">
+                                    <div class="relative">
+                                        {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" class="w-24 h-24 rounded-full object-cover" alt="{{ user.get_full_name }}">
+                                        {% else %}
+                                        <div class="w-24 h-24 rounded-full bg-purple-600 flex items-center justify-center text-white text-xl font-medium">
+                                            {{ user.first_name.0|default:user.username.0|upper }}
+                                        </div>
+                                        {% endif %}
                                     </div>
-                                    {% endif %}
+                                    <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
+                                        <button type="button" onclick="document.getElementById('avatarInput').click()" class="flex-1 sm:flex-none px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded transition-colors">
+                                            {% trans "Change" %}
+                                        </button>
+                                        {% if user.avatar %}
+                                        <a href="{% url 'settings' %}?remove_avatar=1" class="flex-1 sm:flex-none px-3 py-1 bg-neutral-700 hover:bg-neutral-600 text-white text-xs font-medium rounded transition-colors text-center">
+                                            {% trans "Remove" %}
+                                        </a>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
-                                    <button type="button" onclick="document.getElementById('avatarInput').click()" class="flex-1 sm:flex-none px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded transition-colors">
-                                        {% trans "Change" %}
-                                    </button>
-                                    {% if user.avatar %}
-                                    <a href="{% url 'settings' %}?remove_avatar=1" class="flex-1 sm:flex-none px-3 py-1 bg-neutral-700 hover:bg-neutral-600 text-white text-xs font-medium rounded transition-colors text-center">
-                                        {% trans "Remove" %}
-                                    </a>
-                                    {% endif %}
+
+                                <!-- Form fields (2-col grid) -->
+                                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-300 mb-1">{% trans "Username" %}</label>
+                                        <input type="text" value="{{ user.username }}" disabled title="{% trans 'Username cannot be changed' %}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-300 mb-1" for="{{ profile_form.email.id_for_label }}">{% trans "Email" %}</label>
+                                        {{ profile_form.email }}
+                                        {% if profile_form.email.errors %}
+                                            <p class="mt-1 text-xs text-red-400">{{ profile_form.email.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-300 mb-1" for="{{ profile_form.first_name.id_for_label }}">{% trans "First Name" %}</label>
+                                        {{ profile_form.first_name }}
+                                        {% if profile_form.first_name.errors %}
+                                            <p class="mt-1 text-xs text-red-400">{{ profile_form.first_name.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-300 mb-1" for="{{ profile_form.last_name.id_for_label }}">{% trans "Last Name" %}</label>
+                                        {{ profile_form.last_name }}
+                                        {% if profile_form.last_name.errors %}
+                                            <p class="mt-1 text-xs text-red-400">{{ profile_form.last_name.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Form fields (2-col grid) -->
-                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-300 mb-1">{% trans "Username" %}</label>
-                                    <input type="text" value="{{ user.username }}" disabled>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-300 mb-1">{% trans "Email" %}</label>
-                                    <input type="email" value="{{ user.email }}" disabled>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-300 mb-1">{% trans "First Name" %}</label>
-                                    <input type="text" value="{{ user.first_name }}" disabled>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-300 mb-1">{% trans "Last Name" %}</label>
-                                    <input type="text" value="{{ user.last_name }}" disabled>
-                                </div>
+                            <div class="mt-4 flex justify-end">
+                                <button type="submit" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded-lg transition-colors">
+                                    {% trans "Save Profile" %}
+                                </button>
                             </div>
-                        </div>
+                        </form>
                     </div>
 
                     <!-- CHANGE PASSWORD -->
