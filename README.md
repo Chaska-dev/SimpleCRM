@@ -49,11 +49,9 @@ and ready to drop behind nginx/Caddy/Traefik on a single VPS — or to run with
 ---
 
 ## Screenshots
-
-```markdown
 ![Dashboard](https://i.imgur.com/wEWciG6.png)
 ![Contacts list](https://i.imgur.com/xlV9BRe.png)
-```
+
 
 ---
 
